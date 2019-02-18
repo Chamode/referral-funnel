@@ -3,7 +3,7 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link       http://example.com
+ * @link       example.com
  * @since      1.0.0
  *
  * @package    Referral_Funnel
@@ -19,7 +19,7 @@
  *
  * @package    Referral_Funnel
  * @subpackage Referral_Funnel/includes
- * @author     Your Name <email@example.com>
+ * @author     Chamode <chamodeanjana@gmail.com>
  */
 class Referral_Funnel_Loader {
 

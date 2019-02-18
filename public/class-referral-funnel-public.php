@@ -3,7 +3,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       http://example.com
+ * @link       example.com
  * @since      1.0.0
  *
  * @package    Referral_Funnel
@@ -18,7 +18,7 @@
  *
  * @package    Referral_Funnel
  * @subpackage Referral_Funnel/public
- * @author     Your Name <email@example.com>
+ * @author     Chamode <chamodeanjana@gmail.com>
  */
 class Referral_Funnel_Public {
 
@@ -27,9 +27,9 @@ class Referral_Funnel_Public {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $referral_funnel    The ID of this plugin.
+	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
-	private $referral_funnel;
+	private $plugin_name;
 
 	/**
 	 * The version of this plugin.
@@ -44,12 +44,12 @@ class Referral_Funnel_Public {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
-	 * @param      string    $referral_funnel       The name of the plugin.
+	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $referral_funnel, $version ) {
+	public function __construct( $plugin_name, $version ) {
 
-		$this->referral_funnel = $referral_funnel;
+		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
 	}
@@ -73,7 +73,7 @@ class Referral_Funnel_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->referral_funnel, plugin_dir_url( __FILE__ ) . 'css/referral-funnel-public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/referral-funnel-public.css', array(), $this->version, 'all' );
 
 	}
 
@@ -96,7 +96,7 @@ class Referral_Funnel_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->referral_funnel, plugin_dir_url( __FILE__ ) . 'js/referral-funnel-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/referral-funnel-public.js', array( 'jquery' ), $this->version, false );
 
 	}
 
