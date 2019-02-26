@@ -11,71 +11,59 @@
  * @package    Referral_Funnel
  * @subpackage Referral_Funnel/admin/partials
  */
-?>
 
-<!-- This file should primarily consist of HTML with a little bit of PHP. -->
+function referral_funnel_admin_display()
+{
+    ?>
 <div id="app">
-  <v-app id="inspire">
-    <div>
-      <v-alert
-        :value="true"
-        type="success"
-      >
-        This is a success alert.
-      </v-alert>
-  
-      <v-alert
-        :value="true"
-        type="info"
-      >
-        This is a info alert.
-      </v-alert>
-  
-      <v-alert
-        :value="true"
-        type="warning"
-      >
-        This is a warning alert.
-      </v-alert>
-  
-      <v-alert
-        :value="true"
-        type="error"
-      >
-        This is a error alert.
-      </v-alert>
-    </div>
-  </v-app>
-</div><div id="app">
-  <v-app id="inspire">
-    <div>
-      <v-alert
-        :value="true"
-        type="success"
-      >
-        This is a success alert.
-      </v-alert>
-  
-      <v-alert
-        :value="true"
-        type="info"
-      >
-        This is a info alert.
-      </v-alert>
-  
-      <v-alert
-        :value="true"
-        type="warning"
-      >
-        This is a warning alert.
-      </v-alert>
-  
-      <v-alert
-        :value="true"
-        type="error"
-      >
-        This is a error alert.
-      </v-alert>
-    </div>
-  </v-app>
-</div>
+    <v-app id="inspire">
+      <v-toolbar dark color="primary" fixed  style="margin-top:30px">
+        <v-toolbar-title class="white--text">Nutrition</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+        <v-menu offset-y :nudge-left="170" :close-on-content-click="false">
+            <v-btn icon slot="activator">
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+            <v-list>
+              <v-list-tile  v-for="(item, index) in headers"  :key="item.value"   @click="changeSort(item.value)">
+                <v-list-tile-title>{{ item.text }}<v-icon v-if="pagination.sortBy === item.value">{{pagination.descending ? 'arrow_downward':'arrow_upward'}}</v-icon></v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+      </v-toolbar>
+          <v-layout v-resize="onResize" column style="padding-top:56px">
+            <v-data-table :headers="headers" :items="desserts" :search="search" :pagination.sync="pagination" :hide-headers="isMobile" :class="{mobile: isMobile}">
+              <template slot="items" slot-scope="props">
+                <tr v-if="!isMobile">
+                  <td>{{ props.item.name }}</td>
+                  <td class="text-xs-right">{{ props.item.calories }}</td>
+                  <td class="text-xs-right">{{ props.item.fat }}</td>
+                  <td class="text-xs-right">{{ props.item.carbs }}</td>
+                  <td class="text-xs-right">{{ props.item.protein }}</td>
+                  <td class="text-xs-right">{{ props.item.iron }}</td>
+                </tr>
+                <tr v-else>
+                  <td>
+                    <ul class="flex-content">
+                      <li class="flex-item" data-label="Name">{{ props.item.name }}</li>
+                      <li class="flex-item" data-label="Calories">{{ props.item.calories }}</li>
+                      <li class="flex-item" data-label="Fat (g)">{{ props.item.fat }}</li>
+                      <li class="flex-item" data-label="Carbs (g)">{{ props.item.carbs }}</li>
+                      <li class="flex-item" data-label="Protein (g)">{{ props.item.protein }}</li>
+                      <li class="flex-item" data-label="Iron (%)">{{ props.item.iron }}</li>
+                    </ul>
+                  </td>
+                </tr>
+              </template>
+              <v-alert slot="no-results" :value="true" color="error" icon="warning">
+                Your search for "{{ search }}" found no results.
+              </v-alert>
+            </v-data-table>
+          </v-layout>
+    </v-app>
+  </div>
+
+<?php
+}
+?>

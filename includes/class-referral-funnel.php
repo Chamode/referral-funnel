@@ -162,6 +162,8 @@ class Referral_Funnel
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
         $this->loader->add_action('admin_menu', $plugin_admin, 'addAdminMenu');
+        $this->loader->add_action('init', $plugin_admin, 'referral_funnel_register_meta');
+
     }
 
     /**

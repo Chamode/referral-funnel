@@ -77,6 +77,8 @@ class Referral_Funnel_Admin
          */
 
         wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/referral-funnel-admin.css', array(), $this->version, 'all');
+        wp_enqueue_style('fonts', 'https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons', array(), $this->version, 'all');
+        wp_enqueue_style('VuetifyCSS', 'https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css', array(), $this->version, 'all');
 
     }
 
@@ -101,22 +103,55 @@ class Referral_Funnel_Admin
          */
 
         wp_enqueue_script('vue', 'https://cdn.jsdelivr.net/npm/vue@2.6.6/dist/vue.js', [], '2.6.6');
-        wp_enqueue_script($this->plugin_name, 'https://cdn.jsdelivr.net/npm/vuetify@1.5.1/dist/vuetify.min.js',[], '1.5.1');
-
+        wp_enqueue_script('vuetify', 'https://cdn.jsdelivr.net/npm/vuetify@1.5.1/dist/vuetify.min.js', [], '1.5.1');
         wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/referral-funnel-admin.js', [], $this->version, false);
+        wp_enqueue_script('plugin-sidebar-js', plugin_dir_url(__FILE__) . '/js/block.build.js',
+            array('wp-i18n', 'wp-edit-post', 'wp-element', 'wp-editor', 'wp-components',
+                'wp-data', 'wp-plugins', 'wp-edit-post', 'wp-api', 'wp-compose'), $this->version, false);
 
     }
 
     public function addAdminMenu()
     {
-        add_menu_page(
-            __('Referral Funnel', 'referral'),
-            __('Referral Funnel', 'referral'),
-            'manage_options',
-            'referral-funnel/admin/partials/referral-funnel-admin-display.php',
-            '',
-            ''
+        require_once 'partials/referral-funnel-admin-display.php';
+        require_once 'partials/referral-funnel-mailChimp-settings.php';
+
+        add_menu_page('Referral Funnel', 'Referral Funnel', 'manage_options', 'referral-funnel-dashboard');
+        add_submenu_page('referral-funnel-dashboard', 'Referral Funnel Dashboard', 'Referral Funnel Dashboard',
+            'manage_options', 'referral-funnel-dashboard', 'referral_funnel_admin_display');
+        add_submenu_page('referral-funnel-dashboard', 'MailChimp Settings', 'MailChimp Settings',
+            'manage_options', 'referral_funnel_mailChimp_settings','referral_funnel_mailChimp_settings');
+
+    }
+
+    // register custom meta tag field
+    public function referral_funnel_register_meta()
+    {
+        register_meta(
+            'post', 'referral_funnel_meta_ftype', array(
+                'show_in_rest' => true,
+                'single' => true,
+                'type' => 'boolean',
+
+            )
         );
+        register_meta(
+            'post', 'referral_funnel_meta_refNo', array(
+                'show_in_rest' => true,
+                'single' => true,
+                'type' => 'string',
+
+            )
+        );
+        register_meta(
+            'post', 'referral_funnel_meta_mailChimp', array(
+                'show_in_rest' => true,
+                'single' => true,
+                'type' => 'string',
+
+            )
+        );
+
     }
 
 }

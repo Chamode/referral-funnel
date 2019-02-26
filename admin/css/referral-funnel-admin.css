@@ -2,10 +2,7 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
- #referral-funnel-app{
-     background: red
- }
-    .mobile {
+.mobile {
       color: #333;
     }
 
@@ -57,7 +54,7 @@
       list-style: none;
       display: flex;
       flex-wrap: wrap;
-      width: 100%;
+      width: 80%;
     }
 
     .flex-item {
@@ -65,4 +62,7 @@
       width: 50%;
       height: 40px;
       font-weight: bold;
+    }
+    #toolbar {
+      padding-top: 30px;
     }
