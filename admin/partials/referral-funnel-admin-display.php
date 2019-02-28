@@ -14,9 +14,10 @@
 
 function referral_funnel_admin_display()
 {
+
     ?>
-<div id="app">
-    <v-app id="inspire">
+<div id="app" >
+    <v-app id="inspire" :des="[234, 266, 273]" >
       <v-toolbar dark color="primary" fixed  style="margin-top:30px">
         <v-toolbar-title class="white--text">Nutrition</v-toolbar-title>
         <v-spacer></v-spacer>
@@ -46,7 +47,7 @@ function referral_funnel_admin_display()
                 <tr v-else>
                   <td>
                     <ul class="flex-content">
-                      <li class="flex-item" data-label="Name">{{ props.item.name }}</li>
+                      <li class="flex-item" data-label="Name">{{ props.item.email_address }}</li>
                       <li class="flex-item" data-label="Calories">{{ props.item.calories }}</li>
                       <li class="flex-item" data-label="Fat (g)">{{ props.item.fat }}</li>
                       <li class="flex-item" data-label="Carbs (g)">{{ props.item.carbs }}</li>
@@ -62,8 +63,10 @@ function referral_funnel_admin_display()
             </v-data-table>
           </v-layout>
     </v-app>
+
   </div>
 
 <?php
+
 }
 ?>

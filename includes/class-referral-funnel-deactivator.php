@@ -20,17 +20,21 @@
  * @subpackage Referral_Funnel/includes
  * @author     Chamode <chamodeanjana@gmail.com>
  */
-class Referral_Funnel_Deactivator {
+class Referral_Funnel_Deactivator
+{
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function deactivate() {
+    /**
+     * Short Description. (use period)
+     *
+     * Long Description.
+     *
+     * @since    1.0.0
+     */
+    public static function deactivate()
+    {
+        delete_option('referral_funnel_mc_username');
+        delete_option('referral_funnel_mc_apikey');
 
-	}
+    }
 
 }

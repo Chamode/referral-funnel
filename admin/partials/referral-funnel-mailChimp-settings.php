@@ -1,5 +1,7 @@
 <?php
 
+use MailchimpAPI\Mailchimp;
+
 /**
  * Provide a admin area view for the plugin
  *
@@ -14,11 +16,45 @@
 
 function referral_funnel_mailChimp_settings()
 {
+    $username = get_option('referral_funnel_mc_username');
+    $apikey = get_option('referral_funnel_mc_apikey');
     ?>
 <div>
+<h1>MailChimp Authentication</h1>
+<form action="admin.php?page=referral_funnel_mailChimp_settings" method="post">
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input type="text" class="form-control" id="username" aria-describedby="username" placeholder="Username" name='username' value='<?php echo isset($_POST['username']) ? $_POST['username'] : $username; ?>' required>
+  </div>
+  <div class="form-group">
+    <label for="APIkey">API Key</label>
+    <input type="text" class="form-control" id="apikey" placeholder="API Key" name='apikey'  value='<?php echo isset($_POST['apikey']) ? $_POST['apikey'] : $apikey; ?>' required>
+  </div>
 
-<h1>Settings</h1>
+  <button type="submit" class="btn btn-primary">Authenticate</button>
+</form>
+
+
+
 </div>
 <?php
+
+    if ($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST['username']) and isset($_POST['apikey'])) {
+        $username = $_POST['username'];
+        update_option('referral_funnel_mc_username', $_POST['username']);
+        update_option('referral_funnel_mc_apikey', $_POST['apikey']);
+        echo "<br>";
+        try {
+            $mailchimp = new MailChimp($_POST['apikey']);
+            echo '<div class="alert alert-success" role="alert">Successfully Authenticated </div>';
+        }
+        catch (Exception $e) {
+            echo '<div class="alert alert-danger" role="alert">'.$e->getMessage().'</div>';
+        }
+
+
+    }
+
 }
+
 ?>

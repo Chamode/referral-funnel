@@ -20,17 +20,21 @@
  * @subpackage Referral_Funnel/includes
  * @author     Chamode <chamodeanjana@gmail.com>
  */
-class Referral_Funnel_Activator {
+class Referral_Funnel_Activator
+{
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function activate() {
+    /**
+     * Short Description. (use period)
+     *
+     * Long Description.
+     *
+     * @since    1.0.0
+     */
+    public static function activate()
+    {
+        add_action('mailchimp_options', $plugin_admin, 'initialize_mailchimp');
 
 	}
+
 
 }

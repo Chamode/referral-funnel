@@ -125,6 +125,9 @@ class Referral_Funnel
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-referral-funnel-public.php';
 
+        // require plugin_dir_path(__FILE__) . '/MailChimp.php';
+        require plugin_dir_path(__FILE__) . "../vendor/autoload.php";
+
         $this->loader = new Referral_Funnel_Loader();
 
     }
@@ -163,6 +166,9 @@ class Referral_Funnel
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
         $this->loader->add_action('admin_menu', $plugin_admin, 'addAdminMenu');
         $this->loader->add_action('init', $plugin_admin, 'referral_funnel_register_meta');
+        $this->loader->add_action('init', $plugin_admin, 'register_router');
+        $this->loader->add_action('init', $plugin_admin, 'custom_endpoint_generator_get');
+        $this->loader->add_action('init', $plugin_admin, 'remove_admin_bar');
 
     }
 

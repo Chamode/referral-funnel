@@ -1,0 +1,14 @@
+{
+    "require": {
+        "drewm/mailchimp-api": "^2.5",
+        "jhut89/mailchimp3php": "^3.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "": "./"
+        },
+        "files": [
+            "admin/partials/referral-funnel-mailChimp-settings.php"
+        ]
+    }
+}
