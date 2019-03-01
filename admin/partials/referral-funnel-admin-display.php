@@ -17,42 +17,62 @@ function referral_funnel_admin_display()
 
     ?>
 <div id="app" >
-    <v-app id="inspire" :des="[234, 266, 273]" >
-      <v-toolbar dark color="primary" fixed  style="margin-top:30px">
-        <v-toolbar-title class="white--text">Nutrition</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
-        <v-menu offset-y :nudge-left="170" :close-on-content-click="false">
-            <v-btn icon slot="activator">
-                <v-icon>more_vert</v-icon>
-              </v-btn>
-            <v-list>
-              <v-list-tile  v-for="(item, index) in headers"  :key="item.value"   @click="changeSort(item.value)">
-                <v-list-tile-title>{{ item.text }}<v-icon v-if="pagination.sortBy === item.value">{{pagination.descending ? 'arrow_downward':'arrow_upward'}}</v-icon></v-list-tile-title>
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-      </v-toolbar>
-          <v-layout v-resize="onResize" column style="padding-top:56px">
-            <v-data-table :headers="headers" :items="desserts" :search="search" :pagination.sync="pagination" :hide-headers="isMobile" :class="{mobile: isMobile}">
+    <v-app id="inspire" >
+        <v-card-title>
+     <span  class="title"> Referral Funnel Dashboard </span>
+      
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        append-icon="search"
+        label="Search"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
+          <v-layout v-resize="onResize" column>
+            <v-data-table :headers="headers" :items="user_info" :search="search" :pagination.sync="pagination" :hide-headers="isMobile" :class="{mobile: isMobile}">
               <template slot="items" slot-scope="props">
                 <tr v-if="!isMobile">
-                  <td>{{ props.item.name }}</td>
-                  <td class="text-xs-right">{{ props.item.calories }}</td>
-                  <td class="text-xs-right">{{ props.item.fat }}</td>
-                  <td class="text-xs-right">{{ props.item.carbs }}</td>
-                  <td class="text-xs-right">{{ props.item.protein }}</td>
-                  <td class="text-xs-right">{{ props.item.iron }}</td>
+                  <td>{{ props.item.display_name}} </td>
+                  <td class="text-xs-center">{{ props.item.user_email }}</td>
+                  <td class="text-xs-center">{{ props.item.reflink }}</td>
+                  <td class="text-xs-center">{{ props.item.rf_postTitle }}</td>
+                  <td class="text-xs-center">{{ props.item.rf_current_email_id }}</td>
+                  <td class="text-xs-center">{{ props.item.refcount }}</td>
+                  <td class="text-xs-center">{{ props.item.currprogress }}</td>
+                  <td class="text-xs-center">
+                
+                        <v-icon
+                          medium
+                          color= "red"
+                          @click="deleteItem(props.item)"
+                          >
+                          block
+                        </v-icon>
+                      
+               
+                </td>
                 </tr>
                 <tr v-else>
                   <td>
                     <ul class="flex-content">
-                      <li class="flex-item" data-label="Name">{{ props.item.email_address }}</li>
-                      <li class="flex-item" data-label="Calories">{{ props.item.calories }}</li>
-                      <li class="flex-item" data-label="Fat (g)">{{ props.item.fat }}</li>
-                      <li class="flex-item" data-label="Carbs (g)">{{ props.item.carbs }}</li>
-                      <li class="flex-item" data-label="Protein (g)">{{ props.item.protein }}</li>
-                      <li class="flex-item" data-label="Iron (%)">{{ props.item.iron }}</li>
+                      <li class="flex-item" data-label="Name">{{ props.item.data.display_name}}</li>
+                      <li class="flex-item" data-label="User Email">{{ props.item.data.user_email }}</li>
+                      <li class="flex-item" data-label="Referral Link">{{ props.item.meta.refllink[0] }}</li>
+                      <li class="flex-item" data-label="Current Post">{{ props.item.meta.rf_postTitle[0] }}</li>
+                      <li class="flex-item" data-label="Email ID">{{ props.item.meta.rf_current_email_id[0] }}</li>
+                      <li class="flex-item" data-label="Total Invites">{{ props.item.totalinvited }}</li>
+                      <li class="flex-item" data-label="Current Progress">{{ props.item.currprogress }}</li>
+                      <td class="justify-center layout px-30">
+                          <v-icon
+                            large = "true"
+                            @click="deleteItem(props.item)"
+                          >
+                          delete
+                        </v-icon>
+                      </td>
+
                     </ul>
                   </td>
                 </tr>

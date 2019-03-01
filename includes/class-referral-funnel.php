@@ -167,7 +167,6 @@ class Referral_Funnel
         $this->loader->add_action('admin_menu', $plugin_admin, 'addAdminMenu');
         $this->loader->add_action('init', $plugin_admin, 'referral_funnel_register_meta');
         $this->loader->add_action('init', $plugin_admin, 'register_router');
-        $this->loader->add_action('init', $plugin_admin, 'custom_endpoint_generator_get');
         $this->loader->add_action('init', $plugin_admin, 'remove_admin_bar');
 
     }
