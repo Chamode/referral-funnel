@@ -18,18 +18,28 @@ function referral_funnel_admin_display()
     ?>
 <div id="app" >
     <v-app id="inspire" >
-        <v-card-title>
-     <span  class="title"> Referral Funnel Dashboard </span>
-      
-      <v-spacer></v-spacer>
-      <v-text-field
-        v-model="search"
-        append-icon="search"
-        label="Search"
-        single-line
-        hide-details
-      ></v-text-field>
-    </v-card-title>
+      <template v-if="!isDataFetched">
+       <v-icon
+        medium
+        color="red"
+        @click="deleteItem(props.item)"
+        >
+        spin
+      </v-icon>
+      </template>
+      <template v-else>
+          <v-card-title>
+            <span  class="title"> Referral Funnel Dashboard </span>
+
+            <v-spacer></v-spacer>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              single-line
+              hide-details
+            ></v-text-field>
+          </v-card-title>
           <v-layout v-resize="onResize" column>
             <v-data-table :headers="headers" :items="user_info" :search="search" :pagination.sync="pagination" :hide-headers="isMobile" :class="{mobile: isMobile}">
               <template slot="items" slot-scope="props">
@@ -49,8 +59,8 @@ function referral_funnel_admin_display()
                           >
                           block
                         </v-icon>
-                      
-               
+
+
                 </td>
                 </tr>
                 <tr v-else>
@@ -82,6 +92,7 @@ function referral_funnel_admin_display()
               </v-alert>
             </v-data-table>
           </v-layout>
+      </template>
     </v-app>
 
   </div>

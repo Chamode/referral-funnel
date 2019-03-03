@@ -10,6 +10,7 @@ window.onload = function () {
 			pagination: {
 				sortBy: 'name'
 			},
+			isDataFetched: false,
 			selected: [],
 			search: '',
 			isMobile: false,
@@ -47,14 +48,6 @@ window.onload = function () {
 			user_info: []
 
 		}),
-		computed: {
-			// a computed getter
-			iconColor: function () {
-				// `this` points to the vm instance
-				return "red"
-
-			}
-		},
 
 		methods: {
 			onResize() {
@@ -64,43 +57,44 @@ window.onload = function () {
 					this.isMobile = false;
 			},
 			deleteItem(item) {
-				
-				var prompt = confirm('Are you sure you want to block this user?')
-				
-				if (prompt){
-				return new Promise((resolve, reject) => {
-					jQuery.ajax({
-						type: 'POST',
-						url: 'http://localhost/wp-plugin/wp-json/referral-funnel/v1/disable-user',
-						data: {
-							email: item.user_email,
-							user_disabled: item.user_disabled,
-							array_count: item.array_count,
-							pid: item.pid
-						}
-					}).done(data => {
-						this.user_info.forEach(uinfo => {
-							if (item.user_email == uinfo.user_email){
-								uinfo.user_disabled = data
-							}
-						})
-						resolve();
-					}).fail(error => {
-						console.log(error)
-						reject();
 
-					})
-				});} else {
+				var prompt = confirm('Are you sure you want to block or unblock this user?')
+
+				if (prompt) {
+					return new Promise((resolve, reject) => {
+						jQuery.ajax({
+							type: 'POST',
+							url: '/wp-json/referral-funnel/v1/disable-user',
+							data: {
+								email: item.user_email,
+								user_disabled: item.user_disabled,
+								array_count: item.array_count,
+								pid: item.pid
+							}
+						}).done(data => {
+							this.user_info.forEach(uinfo => {
+								if (item.user_email == uinfo.user_email) {
+									uinfo.user_disabled = data
+								}
+							})
+							resolve();
+						}).fail(error => {
+							console.log(error)
+							reject();
+
+						})
+					});
+				} else {
 
 				}
 			},
 			fetchData() {
 				return new Promise((resolve, reject) => {
 					jQuery.ajax({
-						url: 'http://localhost/wp-plugin/wp-json/referral-funnel/v1/list'
+						url: '/wp-json/referral-funnel/v1/list'
 					}).done(data => {
 						data.forEach(data => {
-							
+
 							for (var i = 0; i < data.meta.reflink.length; i++) {
 								let tempObject = {}
 
@@ -120,7 +114,7 @@ window.onload = function () {
 								tempObject.rf_postTitle = data.meta.rf_postTitle[i]
 								tempObject.rf_current_email_id = data.meta.rf_current_email_id[i]
 								tempObject.user_disabled = data.meta.user_disabled[0]
-								tempObject.array_count = i 
+								tempObject.array_count = i
 								tempObject.pid = pid
 								this.user_info.push(tempObject)
 							}
@@ -132,6 +126,8 @@ window.onload = function () {
 						console.log(error)
 						reject();
 
+					}).always(() => {
+						this.isDataFetched = true;
 					})
 				});
 
