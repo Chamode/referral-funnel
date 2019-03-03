@@ -120,15 +120,13 @@ class Referral_Funnel_Admin
     {
         require_once 'partials/referral-funnel-admin-display.php';
         require_once 'partials/referral-funnel-mailChimp-settings.php';
-        require_once 'partials/add_user_temp.php';
 
         add_menu_page('Referral Funnel', 'Referral Funnel', 'manage_options', 'referral-funnel-dashboard');
         add_submenu_page('referral-funnel-dashboard', 'Referral Funnel Dashboard', 'Referral Funnel Dashboard',
             'manage_options', 'referral-funnel-dashboard', 'referral_funnel_admin_display');
         add_submenu_page('referral-funnel-dashboard', 'MailChimp Settings', 'MailChimp Settings',
             'manage_options', 'referral_funnel_mailChimp_settings', 'referral_funnel_mailChimp_settings');
-        add_submenu_page('referral-funnel-dashboard', 'Add User', 'Add User',
-            'manage_options', 'add_user_temp', 'add_user_temp');
+
 
     }
     //remove header menu from all except admins (required since we are gonna auto login users)
@@ -413,7 +411,7 @@ class Referral_Funnel_Admin
 
         $userMeta = get_user_meta($userID, $pid);
 
-        if ($userMeta[0] == $meta_refNo[0]) {
+        if ($userMeta[0] >= $meta_refNo[0]) {
             $sendemail = $this->send_email($meta_workflowid[0], $meta_email_id[0], $user_email, $userID);
             return $sendemail;
         }

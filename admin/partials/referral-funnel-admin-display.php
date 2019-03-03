@@ -42,10 +42,9 @@ function referral_funnel_admin_display()
                   <td class="text-xs-center">{{ props.item.refcount }}</td>
                   <td class="text-xs-center">{{ props.item.currprogress }}</td>
                   <td class="text-xs-center">
-                
                         <v-icon
                           medium
-                          color= "{{iconColor }}"
+                          :color="props.item.user_disabled"
                           @click="deleteItem(props.item)"
                           >
                           block
