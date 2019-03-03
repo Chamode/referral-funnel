@@ -49,6 +49,14 @@ window.onload = function () {
 			user_info: []
 
 		}),
+		computed: {
+			// a computed getter
+			iconColor: function () {
+				// `this` points to the vm instance
+				return "red"
+
+			}
+		},
 
 		methods: {
 			onResize() {
@@ -88,7 +96,11 @@ window.onload = function () {
 						}
 					}).done(data => {
 						console.log(data)
-						this.mounted()
+						this.user_info.forEach(uinfo => {
+							if (item.user_email == uinfo.user_email){
+								uinfo.user_disabled = data
+							}
+						})
 						resolve();
 					}).fail(error => {
 						console.log(error)
@@ -119,14 +131,15 @@ window.onload = function () {
 								);
 								var refcounter = data.meta[pid][0];
 								var requiredref = data.meta['rf_current_required'][i];
-								user_disabled_pid = 
+								data.meta.user_disabled[0] == [] ? data.meta.user_disabled[0] == ["green"] : null
 								tempObject.refcount = refcounter
 								tempObject.currprogress = refcounter + '/' + requiredref
 								tempObject.rf_postTitle = data.meta.rf_postTitle[i]
 								tempObject.rf_current_email_id = data.meta.rf_current_email_id[i]
-								tempObject.user_disabled = data.meta.user_disabled
+								tempObject.user_disabled = data.meta.user_disabled[0]
 								tempObject.array_count = i 
 								tempObject.pid = pid
+								console.log(tempObject)
 								this.user_info.push(tempObject)
 							}
 

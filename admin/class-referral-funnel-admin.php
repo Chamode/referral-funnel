@@ -273,23 +273,26 @@ class Referral_Funnel_Admin
                 ->members()
                 ->post($post_params);
 
-            // User creation and login is handled here. If the user has previously signed up, the will be auto logged in
+            // User creation and login is handled here. If the user has previously signed up, they will be auto logged in
             $user = wp_create_user($_POST['email'], '', $_POST['email']);
             if (!is_wp_error($user)) {
                 if ($uid != $user->ID) {
                     update_user_meta($uid, $pid, $new_ref_count);
                 }
-
-                add_user_meta($uid, 'user_disabled', "no");
-
+                if (get_user_meta($uid, 'user_disabled') == []) {
+                    add_user_meta($uid, 'user_disabled', "green");
+                }
                 wp_set_current_user($user);
                 wp_set_auth_cookie($user, true);
-                return get_user_meta($uid, $pid);
+                return get_user_meta($uid, 'user_disabled');
             } else {
                 $user = get_user_by('email', $_POST['email']);
                 if (!is_wp_error($user)) {
                     if ($uid != $user->ID) {
                         update_user_meta($uid, $pid, $new_ref_count);
+                    }
+                    if (get_user_meta($uid, 'user_disabled') == []) {
+                        add_user_meta($uid, 'user_disabled', "green");
                     }
 
                     wp_set_current_user($user);
@@ -328,12 +331,20 @@ class Referral_Funnel_Admin
             // User creation and login is handled here. If the user has previously signed up, the will be auto logged in
             $user = wp_create_user($_POST['email'], '', $_POST['email']);
             if (!is_wp_error($user)) {
+                if (get_user_meta($uid, 'user_disabled') == []) {
+                    add_user_meta($uid, 'user_disabled', "green");
+                }
+
                 wp_set_current_user($user);
                 wp_set_auth_cookie($user, true);
                 return $addtoList;
             } else {
                 $user = get_user_by('email', $_POST['email']);
                 if (!is_wp_error($user)) {
+                    if (get_user_meta($uid, 'user_disabled') == []) {
+                        add_user_meta($uid, 'user_disabled', "green");
+                    }
+
                     wp_set_current_user($user);
                     wp_set_auth_cookie($user, true);
                     return $addtoList;
@@ -414,8 +425,9 @@ class Referral_Funnel_Admin
     {
         $body = "Your email has been blocked";
         $user_disabled_array = get_user_meta($userID, 'user_disabled');
+        $body = get_user_meta($userID, 'user_disabled');
 
-        if ($user_disabled_array[0] == "no") {
+        if ($user_disabled_array[0] == "green") {
             $api_key = get_option('referral_funnel_mc_apikey');
             $email = $user_email;
 
@@ -453,7 +465,7 @@ class Referral_Funnel_Admin
 
         $user_disabled_array = get_user_meta($user_id, 'user_disabled');
 
-        if ($user_disabled_array[0] == "no") {$user_disabled_array[0] = "yes";} else { $user_disabled_array[0] = "no";}
+        if ($user_disabled_array[0] == "red") {$user_disabled_array[0] = "green";} else { $user_disabled_array[0] = "red";}
 
         update_user_meta($user_id, 'user_disabled', $user_disabled_array[0]);
 

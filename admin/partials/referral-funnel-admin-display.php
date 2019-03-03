@@ -45,7 +45,7 @@ function referral_funnel_admin_display()
                 
                         <v-icon
                           medium
-                          color= "green"
+                          color= "{{iconColor }}"
                           @click="deleteItem(props.item)"
                           >
                           block
@@ -67,7 +67,7 @@ function referral_funnel_admin_display()
                       <td class="justify-center layout px-30">
                           <v-icon
                             large = "true"
-                            color="green"
+                            color={{ props.item.user_disabled[0] }}
                             @click="deleteItem(props.item)"
                           >
                           delete
