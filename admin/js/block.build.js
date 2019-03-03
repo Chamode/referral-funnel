@@ -101,13 +101,12 @@ var Referral_Funnel = function (_Component) {
 
         var _this = _possibleConstructorReturn(this, (Referral_Funnel.__proto__ || Object.getPrototypeOf(Referral_Funnel)).apply(this, arguments));
 
-        var ftypeCon = wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_ftype'] === "" ? false : wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_ftype'];
         _this.state = {
             key: 'referral_funnel_meta',
-            ftype: ftypeCon,
-
             refNo: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_refNo'],
-            mailChimp: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_mailChimp']
+            listid: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_listid'],
+            workflowid: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_workflowid'],
+            workflowemailid: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_workflow_emailid']
 
         };
         console.log(_this.state.ftype);
@@ -138,13 +137,6 @@ var Referral_Funnel = function (_Component) {
                     wp.element.createElement(
                         PanelBody,
                         null,
-                        wp.element.createElement(CheckboxControl, {
-                            label: 'Funnel Beginning',
-                            checked: this.state.ftype,
-                            onChange: function onChange(isChecked) {
-                                _this2.setState({ ftype: isChecked }), wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_ftype: isChecked } });
-                            }
-                        }),
                         wp.element.createElement(TextControl, {
                             label: __('Number of Referrals'),
                             value: this.state.refNo,
@@ -155,12 +147,30 @@ var Referral_Funnel = function (_Component) {
                             }
                         }),
                         wp.element.createElement(TextControl, {
-                            label: __('MailChimp Campaign Name'),
-                            value: this.state.mailChimp,
+                            label: __('MailChimp List ID where the subscribers will be added'),
+                            value: this.state.listid,
                             onChange: function onChange(value) {
                                 _this2.setState({
-                                    mailChimp: value
-                                }), wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_mailChimp: value } });
+                                    listid: value
+                                }), wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_listid: value } });
+                            }
+                        }),
+                        wp.element.createElement(TextControl, {
+                            label: __('MailChimp Workflow ID from Automation'),
+                            value: this.state.workflowid,
+                            onChange: function onChange(value) {
+                                _this2.setState({
+                                    workflowid: value
+                                }), wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_workflowid: value } });
+                            }
+                        }),
+                        wp.element.createElement(TextControl, {
+                            label: __('MailChimp Workflow Email ID from Automation'),
+                            value: this.state.workflowemailid,
+                            onChange: function onChange(value) {
+                                _this2.setState({
+                                    workflowemailid: value
+                                }), wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_workflow_emailid: value } });
                             }
                         })
                     )

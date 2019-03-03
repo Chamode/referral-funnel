@@ -35,13 +35,13 @@ function add_user_temp()
 <?php
 $mailchimp = new MailChimp(get_option('referral_funnel_mc_apikey'));
     $emailSent = $mailchimp
-        ->automations()->get();
+        ->automations('da8d3b8582')->get();
     $id = $emailSent->deserialize(true);
-    $workflow_id = $id['automations'][2]['id'];
-    $emaillist = $mailchimp
-        ->automations($workflow_id)->get();
-    $resp = $emaillist->deserialize(true);
-    print_r($workflow_id);
+    // $workflow_id = $id['automations'][2]['id'];
+    // $emaillist = $mailchimp
+    //     ->automations($workflow_id)->get();
+    // $resp = $emaillist->deserialize(true);
+    print_r($id);
 
 
 

@@ -147,13 +147,22 @@ class Referral_Funnel_Admin
     public function referral_funnel_register_meta()
     {
         register_meta(
-            'post', 'referral_funnel_meta_ftype', array(
+            'post', 'referral_funnel_meta_listid', array(
                 'show_in_rest' => true,
                 'single' => true,
-                'type' => 'boolean',
+                'type' => 'string',
 
             )
         );
+        register_meta(
+            'post', 'referral_funnel_meta_workflowid', array(
+                'show_in_rest' => true,
+                'single' => true,
+                'type' => 'string',
+
+            )
+        );
+
         register_meta(
             'post', 'referral_funnel_meta_refNo', array(
                 'show_in_rest' => true,
@@ -163,7 +172,7 @@ class Referral_Funnel_Admin
             )
         );
         register_meta(
-            'post', 'referral_funnel_meta_mailChimp', array(
+            'post', 'referral_funnel_meta_workflow_emailid', array(
                 'show_in_rest' => true,
                 'single' => true,
                 'type' => 'string',
@@ -204,20 +213,16 @@ class Referral_Funnel_Admin
             'methods' => 'POST',
             'callback' => array($this, 'ajax_endpoint_init_referral_counter'),
         ));
+        register_rest_route('referral-funnel/v1', '/disable-user/', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'ajax_endpoint_disable_user'),
+        ));
 
     }
 
     public function ajax_endpoint_getmembers()
     {
         try {
-            // $mailchimp = new MailChimp(get_option('referral_funnel_mc_apikey'));
-            // $result = $mailchimp
-            //     ->lists('08bda300fd')
-            //     ->members()
-            //     ->get();
-            // $result = $result->getBody();
-            // $result = json_decode($result, true);
-            // $result = $result['members'];
             $subscribers = get_users(array('role' => 'subscriber'));
             $subsWithMeta = array();
 
@@ -229,16 +234,12 @@ class Referral_Funnel_Admin
                 $pid = trim(substr($pid, strpos($pid, '=') + 1));
 
                 $refcounter = $specificMeta[$pid][0];
-                $requiredref = $link = $specificMeta['rf_current_required'][0];
+                $requiredref = $specificMeta['rf_current_required'][0];
 
-                // $unserializedMeta = array();
-                // foreach($specificMeta as $smeta){
-                //     array_push($unserializedMeta, maybe_unserialize( $smeta ));
-                // }
                 $subsWithMeta[$count]['data'] = $user_id->data;
                 $subsWithMeta[$count]['meta'] = $specificMeta;
                 $subsWithMeta[$count]['refcount'] = $refcounter;
-                $subsWithMeta[$count]['currprogress'] = $refcounter . '/' . $requiredref ;
+                $subsWithMeta[$count]['currprogress'] = $refcounter . '/' . $requiredref;
 
                 $count++;
 
@@ -278,6 +279,9 @@ class Referral_Funnel_Admin
                 if ($uid != $user->ID) {
                     update_user_meta($uid, $pid, $new_ref_count);
                 }
+
+                add_user_meta($uid, 'user_disabled', "no");
+
                 wp_set_current_user($user);
                 wp_set_auth_cookie($user, true);
                 return get_user_meta($uid, $pid);
@@ -380,13 +384,10 @@ class Referral_Funnel_Admin
         $post = get_post($pid);
         $postMeta = get_post_meta($pid);
 
-        $meta_beginning = $postMeta['referral_funnel_meta_ftype'];
         $meta_refNo = $postMeta['referral_funnel_meta_refNo'];
-        $meta_email_id = $postMeta['referral_funnel_meta_mailChimp'];
-
-        // if ($meta_beginning == "1") {
-        //     $meta_refNo = 0;
-        // }
+        $meta_listid = $postMeta['referral_funnel_meta_listid'];
+        $meta_workflowid = $postMeta['referral_funnel_meta_workflowid'];
+        $meta_email_id = $postMeta['referral_funnel_meta_workflow_emailid'];
 
         $user = get_user_by('id', $uid);
         $userID = $user->ID;
@@ -402,22 +403,61 @@ class Referral_Funnel_Admin
         $userMeta = get_user_meta($userID, $pid);
 
         if ($userMeta[0] == $meta_refNo[0]) {
-            $sendemail = $this->send_email($meta_email_id[0], $user_email);
-            // return $sendemail;
+            $sendemail = $this->send_email($meta_workflowid[0], $meta_email_id[0], $user_email, $userID);
+            return $sendemail;
         }
 
         return 'You have ' . $userMeta[0] . '/' . $meta_refNo[0] . ' referrals';
 
     }
-    public function send_email($meta_email_id, $user_email)
+    public function send_email($meta_workflowid, $meta_email_id, $user_email, $userID)
     {
-        $mailchimp = new MailChimp(get_option('referral_funnel_mc_apikey'));
-        $emailSent = $mailchimp
-            ->automations('da8d3b8582')
-            ->emails('05cda78e3c')
-            ->queue()
-            ->post('chamodeanjana@gmail.com');
+        $body = "Your email has been blocked";
+        $user_disabled_array = get_user_meta($userID, 'user_disabled');
 
-        return $emailSent->getBody();
+        if ($user_disabled_array[0] == "no") {
+            $api_key = get_option('referral_funnel_mc_apikey');
+            $email = $user_email;
+
+            $args = array(
+                'method' => 'POST',
+                'headers' => array(
+                    'Authorization' => 'Basic ' . base64_encode('user:' . $api_key),
+                ),
+                'body' => json_encode(array(
+                    'email_address' => $email,
+                )),
+            );
+            $response = wp_remote_post('https://' . substr($api_key, strpos($api_key, '-') + 1) . '.api.mailchimp.com/3.0/automations/' . $meta_workflowid . '/emails/' . $meta_email_id . '/queue', $args);
+
+            $body = "Email Sent";
+        }
+        // if ($response['response']['code'] == 204 && $body->status == $status) {
+        //     echo 'The user has been successfully ' . $status . '.';
+        // } else {
+        //     echo '<b>' . $response['response']['code'] . $body->title . ':</b> ' . $body->detail;
+        // }
+
+        return $body;
+
+    }
+    public function ajax_endpoint_disable_user()
+    {
+        $user_email = $_POST['email'];
+        $user_disabled = $_POST['user_disabled'];
+        $array_count = $_POST['array_count'];
+
+        $user = get_user_by('email', $user_email);
+
+        $user_id = $user->ID;
+
+        $user_disabled_array = get_user_meta($user_id, 'user_disabled');
+
+        if ($user_disabled_array[0] == "no") {$user_disabled_array[0] = "yes";} else { $user_disabled_array[0] = "no";}
+
+        update_user_meta($user_id, 'user_disabled', $user_disabled_array[0]);
+
+        return get_user_meta($user_id, 'user_disabled')[0];
+
     }
 }

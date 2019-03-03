@@ -20,18 +20,20 @@ const { withSelect, withDispatch } = wp.data;
 class Referral_Funnel extends Component {
     constructor() {
         super(...arguments);
-        var ftypeCon = wp.data.select('core/editor').getEditedPostAttribute('meta')[
-            'referral_funnel_meta_ftype'] === "" ? false : wp.data.select('core/editor').getEditedPostAttribute('meta')[
-            'referral_funnel_meta_ftype'];
+        
         this.state = {
             key: 'referral_funnel_meta',
-            ftype: ftypeCon,
-
             refNo: wp.data.select('core/editor').getEditedPostAttribute('meta')[
                 'referral_funnel_meta_refNo'
             ],
-            mailChimp: wp.data.select('core/editor').getEditedPostAttribute('meta')[
-                'referral_funnel_meta_mailChimp'
+            listid: wp.data.select('core/editor').getEditedPostAttribute('meta')[
+                'referral_funnel_meta_listid'
+            ],
+            workflowid: wp.data.select('core/editor').getEditedPostAttribute('meta')[
+                'referral_funnel_meta_workflowid'
+            ],
+            workflowemailid: wp.data.select('core/editor').getEditedPostAttribute('meta')[
+                'referral_funnel_meta_workflow_emailid'
             ],
            
         }
@@ -53,14 +55,7 @@ class Referral_Funnel extends Component {
                 >
                     <PanelBody>
 
-                        <CheckboxControl
-                            label="Funnel Beginning"
-                            checked={this.state.ftype}
-                            onChange={(isChecked) => {
-                                this.setState({ ftype: isChecked }),
-                                wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_ftype: isChecked } });
-                            }}
-                        />
+                    
                         <TextControl
                             label={__('Number of Referrals')}
                             value={this.state.refNo}
@@ -72,13 +67,33 @@ class Referral_Funnel extends Component {
                             }}
                         />
                         <TextControl
-                            label={__('MailChimp Campaign Name')}
-                            value={this.state.mailChimp}
+                            label={__('MailChimp List ID where the subscribers will be added')}
+                            value={this.state.listid}
                             onChange={(value) => {
                                 this.setState({
-                                    mailChimp: value
+                                    listid: value
                                 }),
-                                    wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_mailChimp: value } });
+                                    wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_listid: value } });
+                            }}
+                        />
+                        <TextControl
+                            label={__('MailChimp Workflow ID from Automation')}
+                            value={this.state.workflowid}
+                            onChange={(value) => {
+                                this.setState({
+                                    workflowid: value
+                                }),
+                                    wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_workflowid: value } });
+                            }}
+                        />
+                        <TextControl
+                            label={__('MailChimp Workflow Email ID from Automation')}
+                            value={this.state.workflowemailid}
+                            onChange={(value) => {
+                                this.setState({
+                                    workflowemailid: value
+                                }),
+                                    wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_workflow_emailid: value } });
                             }}
                         />
                     </PanelBody>
