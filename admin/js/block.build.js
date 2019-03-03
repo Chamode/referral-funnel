@@ -109,7 +109,6 @@ var Referral_Funnel = function (_Component) {
             workflowemailid: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_workflow_emailid']
 
         };
-        console.log(_this.state.ftype);
         return _this;
     }
 

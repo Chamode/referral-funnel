@@ -37,7 +37,6 @@ class Referral_Funnel extends Component {
             ],
            
         }
-        console.log(this.state.ftype)
     }
 
     render() {

@@ -425,7 +425,6 @@ class Referral_Funnel_Admin
     {
         $body = "Your email has been blocked";
         $user_disabled_array = get_user_meta($userID, 'user_disabled');
-        $body = get_user_meta($userID, 'user_disabled');
 
         if ($user_disabled_array[0] == "green") {
             $api_key = get_option('referral_funnel_mc_apikey');

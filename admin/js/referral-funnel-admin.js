@@ -4,8 +4,6 @@ window.onload = function () {
 		el: '#app',
 		async mounted() {
 			await this.fetchData();
-
-			console.log('done');
 		},
 		data: () => ({
 
@@ -65,25 +63,11 @@ window.onload = function () {
 				else
 					this.isMobile = false;
 			},
-			// toggleAll() {
-			// 	if (this.selected.length) this.selected = []
-			// 	else this.selected = this.desserts.slice()
-			// },
-			// changeSort(column) {
-
-			// 	console.log(column);
-			// 	if (this.pagination.sortBy === column) {
-			// 		this.pagination.descending = !this.pagination.descending
-			// 	} else {
-			// 		this.pagination.sortBy = column
-			// 		this.pagination.descending = false
-			// 	}
-			// },
 			deleteItem(item) {
 				
 				var prompt = confirm('Are you sure you want to block this user?')
 				
-				if (prompt){console.log(item)
+				if (prompt){
 				return new Promise((resolve, reject) => {
 					jQuery.ajax({
 						type: 'POST',
@@ -95,7 +79,6 @@ window.onload = function () {
 							pid: item.pid
 						}
 					}).done(data => {
-						console.log(data)
 						this.user_info.forEach(uinfo => {
 							if (item.user_email == uinfo.user_email){
 								uinfo.user_disabled = data
@@ -115,7 +98,7 @@ window.onload = function () {
 				return new Promise((resolve, reject) => {
 					jQuery.ajax({
 						url: 'http://localhost/wp-plugin/wp-json/referral-funnel/v1/list'
-					}).done(data => {console.log(data)
+					}).done(data => {
 						data.forEach(data => {
 							
 							for (var i = 0; i < data.meta.reflink.length; i++) {
@@ -139,7 +122,6 @@ window.onload = function () {
 								tempObject.user_disabled = data.meta.user_disabled[0]
 								tempObject.array_count = i 
 								tempObject.pid = pid
-								console.log(tempObject)
 								this.user_info.push(tempObject)
 							}
 
