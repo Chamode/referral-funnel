@@ -48,9 +48,9 @@
                         }
 
                     }, 1000);
-                    // $.get('URL').done((data) => {
-                    //    data.joinedDate
-                    // })
+                    $.get('http://localhost/wp-plugin/wp-json/referral-funnel/v1/countdown/').done((data) => {
+                       data.joinedDate
+                    })
                 },
                 formatCountdown() {
                     let formattedCountdown = moment.duration(this.savedTimerMil);

@@ -34,6 +34,8 @@ class Referral_Funnel_Deactivator
     {
         delete_option('referral_funnel_mc_username');
         delete_option('referral_funnel_mc_apikey');
+        delete_option('referral_funnel_countdownstarttime');
+
 
     }
 

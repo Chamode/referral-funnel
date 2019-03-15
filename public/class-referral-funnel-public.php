@@ -104,31 +104,36 @@ class Referral_Funnel_Public
 
     }
 
+    public function options_referral_funnel_init()
+    {
+        add_option('referral_funnel_countdownstarttime', '', '', 'yes');
+    }
     public function shortcode_referral_funnel_init()
     {
-		add_option('referral_funnel_countdownstarttime', '', '', 'yes');
-
-        add_shortcode("ref_funnel_timer", "ref_funnel_timer");
+        add_shortcode('ref_funnel_timer', array($this, 'ref_funnel_timer_func'));
 
     }
-    public function shortcode_referral_funnel_display()
+
+    public function ref_funnel_timer_func()
     {
-        if (shortcode_exists('ref_funnel_timer')) {
-            $user_id = get_current_user_id();
-            if ($user_id != 0) {
-                $user_meta_time = get_user_meta($user_id, 'init_time');
-                if ($user_meta_time == []) {
-                    add_user_meta($user_id, 'init_time', current_time('mysql'));
-                    wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/timer-countdown.js', [], $this->version, false);
+        $user_id = get_current_user_id();
+        if ($user_id != 0) {
+            $user_meta_time = get_user_meta($user_id, 'init_time');
+            if ($user_meta_time == []) {
+                add_user_meta($user_id, 'init_time', current_time('mysql'));
+                wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/timer-countdown.js', [], $this->version, false);
 
-                } else {
-                    wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/timer-countdown.js', [], $this->version, false);
+            } else {
+                wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/timer-countdown.js', [], $this->version, false);
 
-                }
             }
-
+        } else {
+            return "user not initialised";
         }
+        // return "code should not reach here";
+
     }
+
     public function register_router()
     {
 
@@ -138,12 +143,13 @@ class Referral_Funnel_Public
         ));
     }
 
-	public function ajax_endpoint_getcountdown(){
-		$user_id = get_current_user_id();
-		$user_meta_time = get_user_meta($user_id, 'init_time');
-		$maxTime = get_option('referral_funnel_countdownstarttime');
+    public function ajax_endpoint_getcountdown()
+    {
+        $user_id = get_current_user_id();
+        $user_meta_time = get_user_meta($user_id, 'init_time');
+        $maxTime = get_option('referral_funnel_countdownstarttime');
 
-		$arrTimer = [$user_meta_time, $maxTime];
-		return $arrTimer;
-	}
+        $arrTimer = [$user_meta_time, $maxTime];
+        return $arrTimer;
+    }
 }

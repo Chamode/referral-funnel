@@ -33,7 +33,7 @@ class Referral_Funnel_Activator
     public static function activate()
     {
         add_action('mailchimp_options', $plugin_admin, 'initialize_mailchimp');
-        add_action('shortcode_ref_funnel', $plugin_public, 'shortcode_referral_funnel_init');
+        add_action('public_options_ref_funnel', $plugin_public, 'options_referral_funnel_init');
 
 	}
 
