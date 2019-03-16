@@ -49,7 +49,7 @@
 
                     }, 1000);
                     $.get('http://localhost/innerawesome/wp-json/referral-funnel/v1/countdown').done((data) => {
-                        console.log(data)
+                    console.log(data)
                        data.joinedDate
                     })
                 },
