@@ -148,7 +148,7 @@ class Referral_Funnel_Public
     public function ajax_endpoint_getcountdown()
     {
         $user_id = get_current_user_id();
-        $user_meta_time = get_user_meta($user_id, 'init_time');
+        $user_meta_time = get_user_meta(2, 'init_time');
         $maxTime = get_option('referral_funnel_countdownstarttime');
 
         $arrTimer = [$user_meta_time, $maxTime];
