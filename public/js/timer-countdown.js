@@ -1,5 +1,5 @@
 
-(function () {
+(function ($) {
     let initVue = (id) => {
         new Vue({
             el: '#' + id,
@@ -48,7 +48,8 @@
                         }
 
                     }, 1000);
-                    $.get('http://localhost/wp-plugin/wp-json/referral-funnel/v1/countdown/').done((data) => {
+                    $.get('http://localhost/innerawesome/wp-json/referral-funnel/v1/countdown').done((data) => {
+                        console.log(data)
                        data.joinedDate
                     })
                 },
@@ -66,4 +67,4 @@
     //timerIDArray*
 
 
-})();
+})(jQuery);

@@ -100,7 +100,9 @@ class Referral_Funnel_Public
          * class.
          */
 
-        wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/referral-funnel-public.js', array('jquery'), $this->version, false);
+        wp_enqueue_script('vuejs',"https://cdn.jsdelivr.net/npm/vue/dist/vue.js", array(), $this->version, false);
+        wp_enqueue_script('momentjs', plugin_dir_url(__FILE__) . 'js/moment.js', array(), $this->version, false);
+        wp_enqueue_script('jwtechlab-timer', plugin_dir_url(__FILE__) . 'js/referral-funnel-public.js', array('jquery','vuejs', 'momentjs'), $this->version, true);
 
     }
 
@@ -137,7 +139,7 @@ class Referral_Funnel_Public
     public function register_router()
     {
 
-        register_rest_route('referral-funnel/v1', '/countdown/', array(
+        register_rest_route('referral-funnel/v1', 'countdown', array(
             'methods' => 'GET',
             'callback' => array($this, 'ajax_endpoint_getcountdown'),
         ));
