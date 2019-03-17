@@ -53,6 +53,10 @@ function referral_funnel_mailChimp_settings()
         try {
             $mailchimp = new MailChimp($_POST['apikey']);
             echo '<div class="alert alert-success" role="alert">Successfully Authenticated </div>';
+            echo '<div>
+                    <p>Use [ref_funnel_timer] to display the countdown timer.</p>
+                    <p>Use [ref_funnel_unlock_content] to display generated link and number of referrals. </p>
+                  </div>';
         }
         catch (Exception $e) {
             echo '<div class="alert alert-danger" role="alert">'.$e->getMessage().'</div>';
