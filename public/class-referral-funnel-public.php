@@ -163,7 +163,7 @@ class Referral_Funnel_Public
         $translation_array = array('nonce' => wp_create_nonce('wp_rest'));
 
         wp_enqueue_style('bootstrap4', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css', array(), '4.0.0', 'all');
-
+        wp_enqueue_script('fbAPI', 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2', array(), $this->version, false);
         wp_enqueue_script('ref_funnel_sign_up', plugin_dir_url(__FILE__) . 'js/sign-up.js', [], $this->version, false);
         wp_localize_script( 'ref_funnel_sign_up', 'ref_funnel', $translation_array );
     }

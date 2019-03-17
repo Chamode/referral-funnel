@@ -1,4 +1,5 @@
 (function ($) {
+    let domainUrl = "http://localhost/innerawesome/";
     //Check if user is referred 
     let body = document.querySelector('body')
     pageURL = $(location).attr("href");
@@ -26,7 +27,7 @@
     let initReferredUser = () => {
         body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
             node.addEventListener('submit', e => {
-                $.post("http://localhost/innerawe2/wp-json/referral-funnel/v1/addlist", {
+                $.post(domainUrl + "wp-json/referral-funnel/v1/addlist", {
                     pid: pid,
                     uid: uid
                 }).done(data => {
@@ -41,15 +42,16 @@
     }
 
     let initExistingUser = () => {
-        $.post('http://localhost/innerawe2/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL }).done(data => {
-            
-            if (pid && uid && data.userData.ID === 0) 
+        $.post(domainUrl + 'wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL }).done(data => {
+            console.log('here!')
+            console.log(data);
+            if (pid && uid && data.userData.ID === 0)
                 initReferredUser();
             else if (!pid && !uid && data.userData.ID === 0)
                 initForm();
             else
-               createShareBoxHtml(data.shareLink, data.referrals);
-               
+                createShareBoxHtml(data.shareLink, data.referrals);
+
         }).fail(error => {
             console.log(error.responseText)
             alert('Something has went wrong, please refresh the page.');
@@ -63,7 +65,7 @@
                 e.preventDefault();
                 let dataArary = $(e.target).serializeArray();
 
-                $.post('http://localhost/innerawe2/wp-json/referral-funnel/v1/user-authentication', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
+                $.post(domainUrl + 'wp-json/referral-funnel/v1/user-authentication', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
                     createShareBoxHtml(data);
                 });
 
@@ -79,12 +81,21 @@
             <label for="ref-funnel-linkToShare">Share this link with your friends!</label>
             <input type="text" class="form-control" id="ref-funnel-linkToShare" value="${linkToShare}" readonly>
         </div>
+        <div id="jwtechlab-social-share">
+        </div>
         `;
 
         body.querySelectorAll('.tve-leads-conversion-object').forEach(node => {
             let $node = $(node)
             $node.empty();
             $node.append($(html));
+
+            if(FB) {
+                let socialMediaHtml = `<div><div class="fb-share-button" data-href="${linkToShare}" data-layout="button_count" data-size="large"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div></div>
+                <a target="_blank" href="https://wa.me/whatsappphonenumber/?text=${linkToShare}">WhatsApp</a>
+                `
+                $node.find('#jwtechlab-social-share').append($(socialMediaHtml))
+            }
 
         })
     }
