@@ -520,7 +520,7 @@ class Referral_Funnel_Admin
             return http_response_code(403);
         }
 
-        $response['success'] = true;
+        
         $response['userData'] = wp_get_current_user();
 
         $uid = $response['userData']->ID;
@@ -536,8 +536,11 @@ class Referral_Funnel_Admin
         $meta_baselink = $postMeta['referral_funnel_meta_baselink'];
 
         if ($meta_refNo[0] == '' || $meta_refNo[0] == 0 || $meta_refNo[0] == null) {
-            return 'Referral Plugin Not Initialised.';
+			$response['message'] = 'Referral Plugin Not Initialised.';
+            return $response;
         }
+		
+		$response['success'] = true;
 
         $user = get_user_by('id', $uid);
         $userID = $user->ID;

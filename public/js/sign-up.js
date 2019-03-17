@@ -1,7 +1,6 @@
 (function ($) {
     //Check if user is referred 
     let body = document.querySelector('body')
-    pageURL = $(location).attr("href");
 
     var getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = window.location.search.substring(1),
@@ -41,8 +40,6 @@
 
     let initExistingUser = () => {
         $.post('/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL }).done(data => {
-            console.log('here!')
-            console.log(data);
             if (pid && uid && data.userData.ID === 0)
                 initReferredUser();
             else if (!pid && !uid && data.userData.ID === 0)
@@ -52,7 +49,7 @@
 
         }).fail(error => {
             console.error(error.responseText)
-            alert('Something has went wrong, please refresh the page.');
+            alert('Referral Funnel has not loaded properly. Please check if the plugin details or the page info are filled properly.');
         })
     }
 
