@@ -176,6 +176,14 @@ class Referral_Funnel_Admin
 
             )
         );
+        register_meta(
+            'post', 'referral_funnel_meta_baselink', array(
+                'show_in_rest' => true,
+                'single' => true,
+                'type' => 'string',
+
+            )
+        );
 
     }
 
@@ -218,6 +226,10 @@ class Referral_Funnel_Admin
             'methods' => 'POST',
             'callback' => array($this, 'ajax_endpoint_user_authentication'),
         ));
+        register_rest_route('referral-funnel/v1', '/init-page/', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'ajax_endpoint_init_page'),
+        ));
 
     }
 
@@ -255,7 +267,6 @@ class Referral_Funnel_Admin
     }
     public function ajax_endpoint_addlist_referred()
     {
-        $page_path = $_POST['pageURL'];
         $pid = $_POST['pid'];
         $uid = $_POST['uid'];
 
@@ -263,16 +274,16 @@ class Referral_Funnel_Admin
         $current_ref_count = get_user_meta($uid, $pid)[0];
         $new_ref_count = $current_ref_count + 1;
         try {
-            $mailchimp = new MailChimp(get_option('referral_funnel_mc_apikey'));
-            $post_params = [
-                'email_address' => $_POST['email'],
-                'status' => 'subscribed',
-            ];
+            // $mailchimp = new MailChimp(get_option('referral_funnel_mc_apikey'));
+            // $post_params = [
+            //     'email_address' => $_POST['email'],
+            //     'status' => 'subscribed',
+            // ];
 
-            $addtoList = $mailchimp
-                ->lists('08bda300fd')
-                ->members()
-                ->post($post_params);
+            // $addtoList = $mailchimp
+            //     ->lists('08bda300fd')
+            //     ->members()
+            //     ->post($post_params);
 
             // User creation and login is handled here. If the user has previously signed up, they will be auto logged in
             $user = wp_create_user($_POST['email'], '', $_POST['email']);
@@ -285,7 +296,8 @@ class Referral_Funnel_Admin
                 }
                 wp_set_current_user($user);
                 wp_set_auth_cookie($user, true);
-                return get_user_meta($uid, 'user_disabled');
+                return get_user_meta($uid, $pid);
+
             } else {
                 $user = get_user_by('email', $_POST['email']);
                 if (!is_wp_error($user)) {
@@ -365,44 +377,44 @@ class Referral_Funnel_Admin
 
     }
 
-    public function ajax_endpoint_init_referral_counter()
-    {
-        $pid = $_POST['pid'];
-        $uid = $_POST['uid'];
+    // public function ajax_endpoint_init_referral_counter()
+    // {
+    //     $pid = $_POST['pid'];
+    //     $uid = $_POST['uid'];
 
-        $post = get_post($pid);
-        $postMeta = get_post_meta($pid);
+    //     $post = get_post($pid);
+    //     $postMeta = get_post_meta($pid);
 
-        $meta_refNo = $postMeta['referral_funnel_meta_refNo'];
-        $meta_listid = $postMeta['referral_funnel_meta_listid'];
-        $meta_workflowid = $postMeta['referral_funnel_meta_workflowid'];
-        $meta_email_id = $postMeta['referral_funnel_meta_workflow_emailid'];
+    //     $meta_refNo = $postMeta['referral_funnel_meta_refNo'];
+    //     $meta_listid = $postMeta['referral_funnel_meta_listid'];
+    //     $meta_workflowid = $postMeta['referral_funnel_meta_workflowid'];
+    //     $meta_email_id = $postMeta['referral_funnel_meta_workflow_emailid'];
 
-        if ($meta_refNo[0] == '' || $meta_refNo[0] == 0 || $meta_refNo[0] == null) {
-            return 'Referral Plugin Not Initialised.';
-        }
+    //     if ($meta_refNo[0] == '' || $meta_refNo[0] == 0 || $meta_refNo[0] == null) {
+    //         return 'Referral Plugin Not Initialised.';
+    //     }
 
-        $user = get_user_by('id', $uid);
-        $userID = $user->ID;
-        $user_email = $user->data->user_email;
+    //     $user = get_user_by('id', $uid);
+    //     $userID = $user->ID;
+    //     $user_email = $user->data->user_email;
 
-        if (get_user_meta($userID, $pid) == []) {
-            add_user_meta($userID, $pid, 0);
-            add_user_meta($userID, 'rf_current_email_id', $meta_email_id[0]);
-            add_user_meta($userID, 'rf_current_required', $meta_refNo[0]);
+    //     if (get_user_meta($userID, $pid) == []) {
+    //         add_user_meta($userID, $pid, 0);
+    //         add_user_meta($userID, 'rf_current_email_id', $meta_email_id[0]);
+    //         add_user_meta($userID, 'rf_current_required', $meta_refNo[0]);
 
-        }
+    //     }
 
-        $userMeta = get_user_meta($userID, $pid);
+    //     $userMeta = get_user_meta($userID, $pid);
 
-        if ($userMeta[0] >= $meta_refNo[0]) {
-            $sendemail = $this->send_email($meta_workflowid[0], $meta_email_id[0], $user_email, $userID);
-            return $sendemail;
-        }
+    //     if ($userMeta[0] >= $meta_refNo[0]) {
+    //         $sendemail = $this->send_email($meta_workflowid[0], $meta_email_id[0], $user_email, $userID);
+    //         return $sendemail;
+    //     }
 
-        return 'You have ' . $userMeta[0] . '/' . $meta_refNo[0] . ' referrals';
+    //     return 'You have ' . $userMeta[0] . '/' . $meta_refNo[0] . ' referrals';
 
-    }
+    // }
     public function send_email($meta_workflowid, $meta_email_id, $user_email, $userID)
     {
         $body = "Your email has been blocked";
@@ -453,25 +465,19 @@ class Referral_Funnel_Admin
         return get_user_meta($user_id, 'user_disabled')[0];
 
     }
-    public function referral_generate_link($postID)
+    public function referral_generate_link($baselink, $postID, $user_email)
     {
-        $post_meta = get_post_meta( $postID);
-        return $post_meta;
-        // $cleanPath = substr($page_path, 0, strpos($page_path, "?"));
-        // $cleanPath == '' ? $cleanPath = $page_path : $cleanPath = $cleanPath;
-        // $user = get_user_by('email', $user_email);
-        // $post = get_page_by_path(basename(untrailingslashit($cleanPath)));
-        // $postID = $post->ID;
-        // $userID = $user->ID;
-        // $postTitle = $post->post_title;
-        // $uniquePath = $this->generate_unique_path($cleanPath, $postID, $userID);
-        // if (get_user_meta($userID, 'reflink') == [] || get_user_meta($userID, $postID) == []) {
-        //     add_user_meta($userID, 'reflink', $uniquePath);
-        //     add_user_meta($userID, 'rf_postTitle', $postTitle);
 
-        // }
+        $user = get_user_by('email', $user_email);
+        $userID = $user->ID;
+        $uniquePath = $this->generate_unique_path($baselink, $postID, $userID);
+        if (get_user_meta($userID, 'reflink') == [] || get_user_meta($userID, $postID) == []) {
+            add_user_meta($userID, 'reflink', $uniquePath);
+            add_user_meta($userID, 'rf_postTitle', $postTitle);
 
-        // return $uniquePath;
+        }
+
+        return $uniquePath;
 
     }
     public function ajax_endpoint_user_authentication()
@@ -485,9 +491,9 @@ class Referral_Funnel_Admin
 
         //     wp_set_current_user($user);
         //     wp_set_auth_cookie($user, true);
-            $link = $this->referral_generate_link($postID);
+        // $link = $this->referral_generate_link($postID);
 
-            return $link;
+        return $link;
         // } else {
         //     $user = get_user_by('email', $_POST['email']);
         //     if (!is_wp_error($user)) {
@@ -504,9 +510,64 @@ class Referral_Funnel_Admin
         return "Code should not reach here";
 
     }
-    
+
     public function generate_unique_path($cleanPath, $postID, $userID)
     {
         return $cleanPath . '?pid=' . $postID . '&uid=' . $userID;
+    }
+
+    public function ajax_endpoint_init_page()
+    {
+        $response = array('success' => false);
+
+        if (!wp_verify_nonce($_POST['_wpnonce'], 'wp_rest')) {
+            return http_response_code(403);
+        }
+
+        $response['success'] = true;
+        $response['userData'] = wp_get_current_user();
+
+        $uid = $response['userData']->ID;
+        $pid = url_to_postid($_POST['pageURL']);
+
+        $post = get_post($pid);
+        $postMeta = get_post_meta($pid);
+
+        $meta_refNo = $postMeta['referral_funnel_meta_refNo'];
+        $meta_listid = $postMeta['referral_funnel_meta_listid'];
+        $meta_workflowid = $postMeta['referral_funnel_meta_workflowid'];
+        $meta_email_id = $postMeta['referral_funnel_meta_workflow_emailid'];
+        $meta_baselink = $postMeta['referral_funnel_meta_baselink'];
+
+        if ($meta_refNo[0] == '' || $meta_refNo[0] == 0 || $meta_refNo[0] == null) {
+            return 'Referral Plugin Not Initialised.';
+        }
+
+        $user = get_user_by('id', $uid);
+        $userID = $user->ID;
+        $user_email = $user->data->user_email;
+        $uniquePath = $this->referral_generate_link($meta_baselink[0],$pid, $user_email);
+
+        if (get_user_meta($userID, $pid) == []) {
+            add_user_meta($userID, $pid, 0);
+            add_user_meta($userID, 'rf_current_email_id', $meta_email_id[0]);
+            add_user_meta($userID, 'rf_current_required', $meta_refNo[0]);
+
+        }
+
+        $userMeta = get_user_meta($userID, $pid);
+
+        if ($userMeta[0] >= $meta_refNo[0]) {
+            $sendemail = $this->send_email($meta_workflowid[0], $meta_email_id[0], $user_email, $userID);
+            return $sendemail;
+        }
+
+        $response['referrals']['currentProgress'] = $userMeta[0];
+        $response['referrals']['goal'] = $meta_refNo[0];
+
+        $response['shareLink'] = $uniquePath;
+
+        return $response;
+
     }
 }

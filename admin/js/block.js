@@ -35,6 +35,9 @@ class Referral_Funnel extends Component {
             workflowemailid: wp.data.select('core/editor').getEditedPostAttribute('meta')[
                 'referral_funnel_meta_workflow_emailid'
             ],
+            baselink: wp.data.select('core/editor').getEditedPostAttribute('meta')[
+                'referral_funnel_meta_baselink'
+            ],
            
         }
     }
@@ -93,6 +96,16 @@ class Referral_Funnel extends Component {
                                     workflowemailid: value
                                 }),
                                     wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_workflow_emailid: value } });
+                            }}
+                        />
+                        <TextControl
+                            label={__('Baselink where new users are sent to')}
+                            value={this.state.baselink}
+                            onChange={(value) => {
+                                this.setState({
+                                    baselink: value
+                                }),
+                                    wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_baselink: value } });
                             }}
                         />
                     </PanelBody>

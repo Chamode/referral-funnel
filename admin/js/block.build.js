@@ -106,7 +106,8 @@ var Referral_Funnel = function (_Component) {
             refNo: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_refNo'],
             listid: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_listid'],
             workflowid: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_workflowid'],
-            workflowemailid: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_workflow_emailid']
+            workflowemailid: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_workflow_emailid'],
+            baselink: wp.data.select('core/editor').getEditedPostAttribute('meta')['referral_funnel_meta_baselink']
 
         };
         return _this;
@@ -170,6 +171,15 @@ var Referral_Funnel = function (_Component) {
                                 _this2.setState({
                                     workflowemailid: value
                                 }), wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_workflow_emailid: value } });
+                            }
+                        }),
+                        wp.element.createElement(TextControl, {
+                            label: __('Baselink where new users are sent to'),
+                            value: this.state.baselink,
+                            onChange: function onChange(value) {
+                                _this2.setState({
+                                    baselink: value
+                                }), wp.data.dispatch('core/editor').editPost({ meta: { referral_funnel_meta_baselink: value } });
                             }
                         })
                     )

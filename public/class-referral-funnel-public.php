@@ -160,10 +160,11 @@ class Referral_Funnel_Public
 
     public function ref_funnel_unlock_content_func()
     {
-        // wp_enqueue_style('bootstrap4', 'https: //stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css');
-wp_enqueue_style('bootstrap4', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css', array(), '4.0.0', 'all');
+        $translation_array = array('nonce' => wp_create_nonce('wp_rest'));
 
-        wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/sign-up.js', [], $this->version, false);
-        
+        wp_enqueue_style('bootstrap4', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css', array(), '4.0.0', 'all');
+
+        wp_enqueue_script('ref_funnel_sign_up', plugin_dir_url(__FILE__) . 'js/sign-up.js', [], $this->version, false);
+        wp_localize_script( 'ref_funnel_sign_up', 'ref_funnel', $translation_array );
     }
 }
