@@ -1,5 +1,6 @@
 
 (function ($) {
+
     let initVue = (id) => {
         new Vue({
             el: '#' + id,
@@ -17,20 +18,24 @@
             methods: {
                 getUserJoinedDate() {
                     //MAKE SURE TO DELETE 'joinedDate and maxHours' below, AND CHANGE CODE BELOW TO USE FROM DATA OBJECT
-                    this.joinedDate = '2019-03-09 02:03:01';
-                    this.maxHours = 72;
 
-                    setTimeout(() => {
+                    $.get('http://localhost/innerawe2/wp-json/referral-funnel/v1/countdown').done((response) => {
+                        this.joinedDate = response[0][0]
+                        this.maxHours = response[1]
+
                         if (this.joinedDate) {
 
                             let maxDate = moment(this.joinedDate, 'YYYY-MM-DD HH:mm:ss');
                             maxDate.add(this.maxHours, 'h');
 
                             //To check if the timer has already exceeded the time limit
-                            if(!this.currentDate.isBefore(maxDate)) {
+                            if (!this.currentDate.isBefore(maxDate)) {
+                                document.querySelectorAll(".jwtechlab-hide-banner").forEach(el => {
+                                    el.style.display = 'none'
+                                })
                                 return;
                             }
-                            
+
                             this.savedTimerMil = maxDate.diff(this.currentDate);
 
                             this.formatCountdown();
@@ -46,16 +51,11 @@
 
                             recursiveLoop();
                         }
-
-                    }, 1000);
-                    $.get('http://localhost/innerawe2/wp-json/referral-funnel/v1/countdown').done((data) => {
-                    console.log(data)
-                       data.joinedDate
                     })
                 },
                 formatCountdown() {
                     let formattedCountdown = moment.duration(this.savedTimerMil);
-                    this.countdown = `${formattedCountdown.days()}days ${formattedCountdown.hours()}hrs ${formattedCountdown.minutes()}mins ${formattedCountdown.seconds()}s`;
+                    this.countdown = `${formattedCountdown.days()}<span style="color:black">days</span> ${formattedCountdown.hours()}<span style="color:black">hrs</span> ${formattedCountdown.minutes()}<span style="color:black">mins </span>${formattedCountdown.seconds()}<span style="color:black">s</span>`;
                 }
             }
         });

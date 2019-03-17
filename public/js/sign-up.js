@@ -31,9 +31,8 @@
                     pid: pid,
                     uid: uid
                 }).done(data => {
-                    console.log(data)
                 }).fail(error => {
-                    console.log(error.responseText)
+                    console.error(error.responseText)
                     alert('Something has went wrong, please refresh the page.');
                 })
 
@@ -53,7 +52,7 @@
                 createShareBoxHtml(data.shareLink, data.referrals);
 
         }).fail(error => {
-            console.log(error.responseText)
+            console.error(error.responseText)
             alert('Something has went wrong, please refresh the page.');
         })
     }

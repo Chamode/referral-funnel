@@ -11,6 +11,16 @@
  * @package    Referral_Funnel
  * @subpackage Referral_Funnel/public/partials
  */
-?>
 
-<!-- This file should primarily consist of HTML with a little bit of PHP. -->
+
+// <!-- This file should primarily consist of HTML with a little bit of PHP. -->
+function countdownTimer(){
+return '
+        <div v-html="countdown">
+            
+        </div>'
+
+;
+}
+
+?>

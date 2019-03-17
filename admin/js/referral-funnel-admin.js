@@ -79,7 +79,7 @@ window.onload = function () {
 							})
 							resolve();
 						}).fail(error => {
-							console.log(error)
+							console.error(error)
 							reject();
 
 						})
@@ -123,7 +123,7 @@ window.onload = function () {
 						});
 						resolve();
 					}).fail(error => {
-						console.log(error)
+						console.error(error)
 						reject();
 
 					}).always(() => {

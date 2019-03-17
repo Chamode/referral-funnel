@@ -129,7 +129,9 @@ class Referral_Funnel_Public
 
             } else {
                 wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/timer-countdown.js', [], $this->version, false);
-                return "User 2";
+                require_once plugin_dir_path(__FILE__) . 'partials\referral-funnel-public-display.php';
+
+                return countdownTimer();
 
             }
         } else {
@@ -155,7 +157,7 @@ class Referral_Funnel_Public
         $maxTime = get_option('referral_funnel_countdownstarttime');
 
         $arrTimer = [$user_meta_time, $maxTime];
-        return 'test';
+        return $arrTimer;
     }
 
     public function ref_funnel_unlock_content_func()

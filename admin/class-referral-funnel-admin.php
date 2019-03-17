@@ -103,13 +103,9 @@ class Referral_Funnel_Admin
          * class.
          */
 
-        wp_enqueue_script('vue', 'https://cdn.jsdelivr.net/npm/vue@2.6.6/dist/vue.js', [], '2.6.6');
+        wp_enqueue_script('vue', plugin_dir_url(__FILE__) . 'js/vue.min.js', [], '2.6.6');
         wp_enqueue_script('vuetify', 'https://cdn.jsdelivr.net/npm/vuetify@1.5.1/dist/vuetify.min.js', [], '1.5.1');
         wp_enqueue_script('jquery', 'https: //code.jquery.com/jquery-3.2.1.slim.min.js', [], '3.2.1');
-        // wp_enqueue_script('ajax', 'https: //cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js', [], '1.12.9');
-        // wp_enqueue_script('bootstrapcdnJS', 'https: //maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js', [], '4.0.0');
-        // wp_enqueue_scripts( 'axios','https: //unpkg.com/axios/dist/axios.min.js', [], '0.18.0');
-
         wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/referral-funnel-admin.js', [], $this->version, false);
         wp_enqueue_script('plugin-sidebar-js', plugin_dir_url(__FILE__) . '/js/block.build.js',
             array('wp-i18n', 'wp-edit-post', 'wp-element', 'wp-editor', 'wp-components',
@@ -121,7 +117,7 @@ class Referral_Funnel_Admin
         require_once 'partials/referral-funnel-admin-display.php';
         require_once 'partials/referral-funnel-mailChimp-settings.php';
 
-        add_menu_page('Referral Funnel', 'Referral Funnel', 'manage_options', 'referral-funnel-dashboard');
+        add_menu_page('Referral Funnel', 'Referral Funnel', 'manage_options', 'referral-funnel-dashboard','', 'dashicons-admin-links');
         add_submenu_page('referral-funnel-dashboard', 'Referral Funnel Dashboard', 'Referral Funnel Dashboard',
             'manage_options', 'referral-funnel-dashboard', 'referral_funnel_admin_display');
         add_submenu_page('referral-funnel-dashboard', 'MailChimp Settings', 'MailChimp Settings',
