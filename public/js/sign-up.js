@@ -1,5 +1,4 @@
 (function ($) {
-    let domainUrl = "http://localhost/innerawesome/";
     //Check if user is referred 
     let body = document.querySelector('body')
     pageURL = $(location).attr("href");
@@ -27,7 +26,7 @@
     let initReferredUser = () => {
         body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
             node.addEventListener('submit', e => {
-                $.post(domainUrl + "wp-json/referral-funnel/v1/addlist", {
+                $.post("/wp-json/referral-funnel/v1/addlist", {
                     pid: pid,
                     uid: uid
                 }).done(data => {
@@ -41,7 +40,7 @@
     }
 
     let initExistingUser = () => {
-        $.post(domainUrl + 'wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL }).done(data => {
+        $.post('/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL }).done(data => {
             console.log('here!')
             console.log(data);
             if (pid && uid && data.userData.ID === 0)
@@ -64,7 +63,7 @@
                 e.preventDefault();
                 let dataArary = $(e.target).serializeArray();
 
-                $.post(domainUrl + 'wp-json/referral-funnel/v1/user-authentication', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
+                $.post('/wp-json/referral-funnel/v1/user-authentication', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
                     createShareBoxHtml(data);
                 });
 
