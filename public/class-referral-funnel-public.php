@@ -100,9 +100,9 @@ class Referral_Funnel_Public
          * class.
          */
 
-        wp_enqueue_script('vuejs',"https://cdn.jsdelivr.net/npm/vue/dist/vue.js", array(), $this->version, false);
+        wp_enqueue_script('vuejs', "https://cdn.jsdelivr.net/npm/vue/dist/vue.js", array(), $this->version, false);
         wp_enqueue_script('momentjs', plugin_dir_url(__FILE__) . 'js/moment.js', array(), $this->version, false);
-        wp_enqueue_script('jwtechlab-timer', plugin_dir_url(__FILE__) . 'js/referral-funnel-public.js', array('jquery','vuejs', 'momentjs'), $this->version, true);
+        wp_enqueue_script('jwtechlab-timer', plugin_dir_url(__FILE__) . 'js/referral-funnel-public.js', array('jquery', 'vuejs', 'momentjs'), $this->version, true);
 
     }
 
@@ -113,6 +113,7 @@ class Referral_Funnel_Public
     public function shortcode_referral_funnel_init()
     {
         add_shortcode('ref_funnel_timer', array($this, 'ref_funnel_timer_func'));
+        add_shortcode('ref_funnel_unlock_content', array($this, 'ref_funnel_unlock_content_func'));
 
     }
 
@@ -124,15 +125,17 @@ class Referral_Funnel_Public
             if ($user_meta_time == []) {
                 add_user_meta($user_id, 'init_time', current_time('mysql'));
                 wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/timer-countdown.js', [], $this->version, false);
+                return "User 1";
 
             } else {
                 wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/timer-countdown.js', [], $this->version, false);
+                return "User 2";
 
             }
         } else {
-            return "user not initialised";
+            return "User not initialised";
         }
-        // return "code should not reach here";
+        return "Code should not reach here";
 
     }
 
@@ -152,6 +155,15 @@ class Referral_Funnel_Public
         $maxTime = get_option('referral_funnel_countdownstarttime');
 
         $arrTimer = [$user_meta_time, $maxTime];
-        return $arrTimer;
+        return 'test';
+    }
+
+    public function ref_funnel_unlock_content_func()
+    {
+        // wp_enqueue_style('bootstrap4', 'https: //stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css');
+wp_enqueue_style('bootstrap4', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css', array(), '4.0.0', 'all');
+
+        wp_enqueue_script('ref_funnel_shortcode', plugin_dir_url(__FILE__) . 'js/sign-up.js', [], $this->version, false);
+        
     }
 }

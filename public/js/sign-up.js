@@ -1,18 +1,17 @@
-(function() {
+(function($) {
     //Check if user is referred 
     let body = document.querySelector('body')
-
+    pageURL = $(location).attr("href");
     body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
         //Create the link
         node.addEventListener('submit', e => {
             e.preventDefault();
             let dataArary = $(e.target).serializeArray();
+            
+            $.post('http://localhost/innerawe2/wp-json/referral-funnel/v1/user-authentication', { data: JSON.stringify(dataArary), pageURL: pageURL}).done(data => {
+                createShareBoxHtml(data);
+            });
 
-            // $.post('', {data: JSON.stringify(dataArary)})
-            setTimeout(() => {
-                let linkToShare = "https://www.innerawesome.website";
-                createShareBoxHtml(linkToShare);
-            }, 3000);
         });
     });
 
@@ -32,4 +31,4 @@
         
         })
     }
-})();
+})(jQuery);
