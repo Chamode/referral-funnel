@@ -93,8 +93,9 @@ window.onload = function () {
 					jQuery.ajax({
 						url: '/wp-json/referral-funnel/v1/list'
 					}).done(data => {
+						
 						data.forEach(data => {
-
+console.log(data)
 							for (var i = 0; i < data.meta.reflink.length; i++) {
 								let tempObject = {}
 
@@ -108,6 +109,7 @@ window.onload = function () {
 								);
 								var refcounter = data.meta[pid][0];
 								var requiredref = data.meta['rf_current_required'][i];
+								
 								data.meta.user_disabled[0] == [] ? data.meta.user_disabled[0] == ["green"] : null
 								tempObject.refcount = refcounter
 								tempObject.currprogress = refcounter + '/' + requiredref

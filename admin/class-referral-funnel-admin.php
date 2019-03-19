@@ -1,5 +1,4 @@
 <?php
-use MailchimpAPI\Mailchimp;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -117,7 +116,7 @@ class Referral_Funnel_Admin
         require_once 'partials/referral-funnel-admin-display.php';
         require_once 'partials/referral-funnel-mailChimp-settings.php';
 
-        add_menu_page('Referral Funnel', 'Referral Funnel', 'manage_options', 'referral-funnel-dashboard','', 'dashicons-admin-links');
+        add_menu_page('Referral Funnel', 'Referral Funnel', 'manage_options', 'referral-funnel-dashboard', '', 'dashicons-admin-links');
         add_submenu_page('referral-funnel-dashboard', 'Referral Funnel Dashboard', 'Referral Funnel Dashboard',
             'manage_options', 'referral-funnel-dashboard', 'referral_funnel_admin_display');
         add_submenu_page('referral-funnel-dashboard', 'MailChimp Settings', 'MailChimp Settings',
@@ -265,6 +264,8 @@ class Referral_Funnel_Admin
     {
         $pid = $_POST['pid'];
         $uid = $_POST['uid'];
+        $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
+        $user_email = $data[1]->value;
 
         //get current user referral count
         $current_ref_count = get_user_meta($uid, $pid)[0];
@@ -282,13 +283,13 @@ class Referral_Funnel_Admin
             //     ->post($post_params);
 
             // User creation and login is handled here. If the user has previously signed up, they will be auto logged in
-            $user = wp_create_user($_POST['email'], '', $_POST['email']);
+            $user = wp_create_user($user_email, '', $user_email);
             if (!is_wp_error($user)) {
                 if ($uid != $user->ID) {
                     update_user_meta($uid, $pid, $new_ref_count);
                 }
-                if (get_user_meta($uid, 'user_disabled') == []) {
-                    add_user_meta($uid, 'user_disabled', "green");
+                if (get_user_meta($user, 'user_disabled') == []) {
+                    add_user_meta($user, 'user_disabled', "green");
                 }
                 wp_set_current_user($user);
                 wp_set_auth_cookie($user, true);
@@ -300,8 +301,8 @@ class Referral_Funnel_Admin
                     if ($uid != $user->ID) {
                         update_user_meta($uid, $pid, $new_ref_count);
                     }
-                    if (get_user_meta($uid, 'user_disabled') == []) {
-                        add_user_meta($uid, 'user_disabled', "green");
+                    if (get_user_meta($user, 'user_disabled') == []) {
+                        add_user_meta($user, 'user_disabled', "green");
                     }
 
                     wp_set_current_user($user);
@@ -320,58 +321,58 @@ class Referral_Funnel_Admin
         }
 
     }
-    public function ajax_endpoint_addlist_unreferred()
-    {
-        $page_path = $_POST['pageURL'];
+    // public function ajax_endpoint_addlist_unreferred()
+    // {
+    //     $page_path = $_POST['pageURL'];
 
-        $new_ref_count = $current_ref_count + 1;
-        try {
-            $mailchimp = new MailChimp(get_option('referral_funnel_mc_apikey')); //authenticate Mailchimp
-            //set up parameters based on user input
-            $post_params = [
-                'email_address' => $_POST['email'],
-                'status' => 'subscribed',
-            ];
+    //     $new_ref_count = $current_ref_count + 1;
+    //     try {
+    //         $mailchimp = new MailChimp(get_option('referral_funnel_mc_apikey')); //authenticate Mailchimp
+    //         //set up parameters based on user input
+    //         $post_params = [
+    //             'email_address' => $_POST['email'],
+    //             'status' => 'subscribed',
+    //         ];
 
-            //add list function (library is used)
-            $addtoList = $mailchimp
-                ->lists('08bda300fd')
-                ->members()
-                ->post($post_params);
+    //         //add list function (library is used)
+    //         $addtoList = $mailchimp
+    //             ->lists('08bda300fd')
+    //             ->members()
+    //             ->post($post_params);
 
-            // User creation and login is handled here. If the user has previously signed up, the will be auto logged in
-            $user = wp_create_user($_POST['email'], '', $_POST['email']);
-            if (!is_wp_error($user)) {
-                if (get_user_meta($uid, 'user_disabled') == []) {
-                    add_user_meta($uid, 'user_disabled', "green");
-                }
+    //         // User creation and login is handled here. If the user has previously signed up, the will be auto logged in
+    //         $user = wp_create_user($_POST['email'], '', $_POST['email']);
+    //         if (!is_wp_error($user)) {
+    //             if (get_user_meta($uid, 'user_disabled') == []) {
+    //                 add_user_meta($uid, 'user_disabled', "green");
+    //             }
 
-                wp_set_current_user($user);
-                wp_set_auth_cookie($user, true);
-                return $addtoList;
-            } else {
-                $user = get_user_by('email', $_POST['email']);
-                if (!is_wp_error($user)) {
-                    if (get_user_meta($uid, 'user_disabled') == []) {
-                        add_user_meta($uid, 'user_disabled', "green");
-                    }
+    //             wp_set_current_user($user);
+    //             wp_set_auth_cookie($user, true);
+    //             return $addtoList;
+    //         } else {
+    //             $user = get_user_by('email', $_POST['email']);
+    //             if (!is_wp_error($user)) {
+    //                 if (get_user_meta($uid, 'user_disabled') == []) {
+    //                     add_user_meta($uid, 'user_disabled', "green");
+    //                 }
 
-                    wp_set_current_user($user);
-                    wp_set_auth_cookie($user, true);
-                    return $addtoList;
-                } else {
-                    return $user->get_error_message();
-                }
+    //                 wp_set_current_user($user);
+    //                 wp_set_auth_cookie($user, true);
+    //                 return $addtoList;
+    //             } else {
+    //                 return $user->get_error_message();
+    //             }
 
-            }
-            return "Code should not reach here";
+    //         }
+    //         return "Code should not reach here";
 
-        } catch (Exception $e) {
-            echo '<div class="alert alert-danger" role="alert">' . $e->getMessage() . '</div>';
-            return "Error";
-        }
+    //     } catch (Exception $e) {
+    //         echo '<div class="alert alert-danger" role="alert">' . $e->getMessage() . '</div>';
+    //         return "Error";
+    //     }
 
-    }
+    // }
 
     // public function ajax_endpoint_init_referral_counter()
     // {
@@ -467,7 +468,7 @@ class Referral_Funnel_Admin
         $user = get_user_by('email', $user_email);
         $userID = $user->ID;
         $uniquePath = $this->generate_unique_path($baselink, $postID, $userID);
-        if (get_user_meta($userID, 'reflink') == [] || get_user_meta($userID, $postID) == []) {
+        if (get_user_meta($userID, 'reflink') == [] && get_user_meta($userID, $postID) == []) {
             add_user_meta($userID, 'reflink', $uniquePath);
             add_user_meta($userID, 'rf_postTitle', $postTitle);
 
@@ -478,32 +479,41 @@ class Referral_Funnel_Admin
     }
     public function ajax_endpoint_user_authentication()
     {
-        $postID = url_to_postid($_POST['pageURL']);
+        $pid = url_to_postid($_POST['pageURL']);
+        $postMeta = get_post_meta($pid);
+        $meta_baselink = $postMeta['referral_funnel_meta_baselink'];
 
-        // $data = json_decode($_POST['data']);
+        $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
+        $user_email = $data[1]->value;
         // User creation and login is handled here. If the user has previously signed up, the will be auto logged in
-        // $user = wp_create_user($data->email, '', $data->email);
-        // if (!is_wp_error($user)) {
+        $user = wp_create_user($user_email, '', $user_email);
+        if (!is_wp_error($user)) {
+            if (get_user_meta($user, 'user_disabled') == []) {
+                add_user_meta($user, 'user_disabled', "green");
+            }
+            wp_set_current_user($user);
+            wp_set_auth_cookie($user, true);
 
-        //     wp_set_current_user($user);
-        //     wp_set_auth_cookie($user, true);
-        // $link = $this->referral_generate_link($postID);
+            $link = $this->referral_generate_link($meta_baselink[0], $pid, $user_email);
 
-        return $link;
-        // } else {
-        //     $user = get_user_by('email', $_POST['email']);
-        //     if (!is_wp_error($user)) {
-        //         wp_set_current_user($user);
-        //         wp_set_auth_cookie($user, true);
-        //         $link = referral_generate_link($postID, $data);
+            return $link;
+        } else {
+            $user = get_user_by('email', $user_email);
+            if (!is_wp_error($user)) {
+                if (get_user_meta($uid, 'user_disabled') == []) {
+                    add_user_meta($uid, 'user_disabled', "green");
+                }
+                wp_set_current_user($user);
+                wp_set_auth_cookie($user, true);
+                $link = referral_generate_link($postID, $data);
 
-        //         return $link;
+                $link = $this->referral_generate_link($meta_baselink[0], $pid, $user_email);
 
-        //     } else {
-        //         return $user->get_error_message();
-        //     }
-        // }
-        return "Code should not reach here";
+            } else {
+                return $user->get_error_message();
+            }
+        }
+        return;
 
     }
 
@@ -520,13 +530,12 @@ class Referral_Funnel_Admin
             return http_response_code(403);
         }
 
-        
         $response['userData'] = wp_get_current_user();
 
         $uid = $response['userData']->ID;
         $pid = url_to_postid($_POST['pageURL']);
 
-        $post = get_post($pid);
+        // $post = get_post($pid);
         $postMeta = get_post_meta($pid);
 
         $meta_refNo = $postMeta['referral_funnel_meta_refNo'];
@@ -536,16 +545,16 @@ class Referral_Funnel_Admin
         $meta_baselink = $postMeta['referral_funnel_meta_baselink'];
 
         if ($meta_refNo[0] == '' || $meta_refNo[0] == 0 || $meta_refNo[0] == null) {
-			$response['message'] = 'Referral Plugin Not Initialised.';
+            $response['message'] = 'Referral Plugin Not Initialised.';
             return $response;
         }
-		
-		$response['success'] = true;
+
+        $response['success'] = true;
 
         $user = get_user_by('id', $uid);
         $userID = $user->ID;
         $user_email = $user->data->user_email;
-        $uniquePath = $this->referral_generate_link($meta_baselink[0],$pid, $user_email);
+        $uniquePath = $this->referral_generate_link($meta_baselink[0], $pid, $user_email);
 
         if (get_user_meta($userID, $pid) == []) {
             add_user_meta($userID, $pid, 0);

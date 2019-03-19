@@ -25,7 +25,9 @@
     let initReferredUser = () => {
         body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
             node.addEventListener('submit', e => {
+                let dataArary = $(e.target).serializeArray();
                 $.post("/wp-json/referral-funnel/v1/addlist", {
+                    data: JSON.stringify(dataArary),
                     pid: pid,
                     uid: uid
                 }).done(data => {
@@ -59,8 +61,9 @@
             node.addEventListener('submit', e => {
                 e.preventDefault();
                 let dataArary = $(e.target).serializeArray();
-
+                console.log(JSON.stringify(dataArary))
                 $.post('/wp-json/referral-funnel/v1/user-authentication', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
+                    console.log("count")
                     createShareBoxHtml(data);
                 });
 
@@ -85,7 +88,7 @@
             $node.empty();
             $node.append($(html));
 
-            if(FB) {
+            if (FB) {
                 let socialMediaHtml = `<div><div class="fb-share-button" data-href="${linkToShare}" data-layout="button_count" data-size="large"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div></div>
                 <a target="_blank" href="https://wa.me/whatsappphonenumber/?text=${linkToShare}">WhatsApp</a>
                 `
