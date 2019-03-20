@@ -26,15 +26,32 @@
         body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
             node.addEventListener('submit', e => {
                 let dataArary = $(e.target).serializeArray();
-                $.post("/wp-json/referral-funnel/v1/addlist", {
+                $.post("/wp-json/referral-funnel/v1/check-user", {
                     data: JSON.stringify(dataArary),
                     pid: pid,
                     uid: uid
                 }).done(data => {
+                    if (data === true) {
+                        alert('User has already been referred!');
+                        // window.location.reload();
+                        window.location.reload(true)
+                    }
+                    else {
+                        $.post("/wp-json/referral-funnel/v1/addlist", {
+                            data: JSON.stringify(dataArary),
+                            pid: pid,
+                            uid: uid
+                        }).done(data => {
+                        }).fail(error => {
+                            console.error(error.responseText)
+                            alert('Something has went wrong, please refresh the page.');
+                        })
+                    }
                 }).fail(error => {
                     console.error(error.responseText)
-                    alert('Something has went wrong, please refresh the page.');
+
                 })
+
 
             });
         })
@@ -50,7 +67,6 @@
                 createShareBoxHtml(data.shareLink, data.referrals);
 
         }).fail(error => {
-            console.error(error.responseText)
             alert('Referral Funnel has not loaded properly. Please check if the plugin details or the page info are filled properly.');
         })
     }

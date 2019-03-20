@@ -225,7 +225,31 @@ class Referral_Funnel_Admin
             'methods' => 'POST',
             'callback' => array($this, 'ajax_endpoint_init_page'),
         ));
+        register_rest_route('referral-funnel/v1', '/check-user/', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'ajax_endpoint_check_user'),
+        ));
 
+    }
+    public function ajax_endpoint_check_user()
+    {
+        $pid = $_POST['pid'];
+        $uid = $_POST['uid'];
+        $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
+        $user_email = $data[1]->value;
+
+        $userReferrer = get_user_by('id', $uid);
+        $userRefd = get_user_by('email', $user_email);
+
+        if ($userRefd->ID == $uid) {
+            return true;
+        }
+
+        if ($userRefd != false) {
+            $meta = get_user_meta($userRefd->ID);
+            return array_key_exists($pid, $meta);
+        }
+        return false;
     }
 
     public function ajax_endpoint_getmembers()
@@ -296,7 +320,7 @@ class Referral_Funnel_Admin
                 return get_user_meta($uid, $pid);
 
             } else {
-                $user = get_user_by('email', $_POST['email']);
+                $user = get_user_by('email', $user_email);
                 if (!is_wp_error($user)) {
                     if ($uid != $user->ID) {
                         update_user_meta($uid, $pid, $new_ref_count);
