@@ -38,8 +38,12 @@ function referral_funnel_mailChimp_settings()
   <button type="submit" class="btn btn-primary">Authenticate</button>
 </form>
 
-
-
+<?php
+echo '<div>
+                    <p>Use [ref_funnel_timer] to display the countdown timer.</p>
+                    <p>Use [ref_funnel_unlock_content] to display generated link and number of referrals. </p>
+                  </div>';
+?>
 </div>
 <?php
 
