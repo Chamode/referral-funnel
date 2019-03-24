@@ -290,6 +290,7 @@ class Referral_Funnel_Admin
         $uid = $_POST['uid'];
         $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
         $user_email = $data[1]->value;
+        $user_name = $data[0]->value;
 
         //get current user referral count
         $current_ref_count = get_user_meta($uid, $pid)[0];
@@ -307,7 +308,7 @@ class Referral_Funnel_Admin
             //     ->post($post_params);
 
             // User creation and login is handled here. If the user has previously signed up, they will be auto logged in
-            $user = wp_create_user($user_email, '', $user_email);
+            $user = wp_create_user($user_name, '', $user_email);
             if (!is_wp_error($user)) {
                 if ($uid != $user->ID) {
                     update_user_meta($uid, $pid, $new_ref_count);
@@ -509,8 +510,10 @@ class Referral_Funnel_Admin
 
         $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
         $user_email = $data[1]->value;
+        $user_name = $data[1]->value;
+
         // User creation and login is handled here. If the user has previously signed up, the will be auto logged in
-        $user = wp_create_user($user_email, '', $user_email);
+        $user = wp_create_user($user_name, '', $user_email);
         if (!is_wp_error($user)) {
             if (get_user_meta($user, 'user_disabled') == []) {
                 add_user_meta($user, 'user_disabled', "green");
