@@ -26,7 +26,7 @@
         body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
             node.addEventListener('submit', e => {
                 let dataArary = $(e.target).serializeArray();
-                $.post("/wp-json/referral-funnel/v1/check-user", {
+                $.post("/innerawe2/wp-json/referral-funnel/v1/check-user", {
                     data: JSON.stringify(dataArary),
                     pid: pid,
                     uid: uid
@@ -37,7 +37,7 @@
                         window.location.reload(true)
                     }
                     else {
-                        $.post("/wp-json/referral-funnel/v1/addlist", {
+                        $.post("/innerawe2/wp-json/referral-funnel/v1/addlist", {
                             data: JSON.stringify(dataArary),
                             pid: pid,
                             uid: uid
@@ -58,29 +58,37 @@
     }
 
     let initExistingUser = () => {
-        $.post('/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL }).done(data => {
-            if (pid && uid && data.userData.ID === 0)
-                initReferredUser();
-            else if (!pid && !uid && data.userData.ID === 0)
-                initForm();
-            else
-                createShareBoxHtml(data.shareLink, data.referrals);
+        $.post('/innerawe2/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL }).done(data => {
+            console.log(data);
+            if (data.init) {
+                //Referred user
+                if (pid && uid && data.user.ID === 0)
+                    initReferredUser();
+                //Unreffered User
+                else if (!pid && !uid && data.user.ID === 0)
+                    initUnreferredUser();
+                //User already signed up
+                else
+                    createShareBoxHtml(data.shareLink, data.referrals);
+            }
+
 
         }).fail(error => {
+            console.log(error)
             alert('Referral Funnel has not loaded properly. Please check if the plugin details or the page info are filled properly.');
         })
     }
 
-    let initForm = () => {
+    let initUnreferredUser = () => {
+        console.log('Unreferred user init!')
         body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
             //Create the link
             node.addEventListener('submit', e => {
                 e.preventDefault();
                 let dataArary = $(e.target).serializeArray();
-                console.log(JSON.stringify(dataArary))
-                $.post('/wp-json/referral-funnel/v1/user-authentication', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
-                    console.log("count")
-                    createShareBoxHtml(data);
+                $.post('/innerawe2/wp-json/referral-funnel/v1/user-register', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
+                    console.log(data)
+                    createShareBoxHtml(data.link, data.referrals);
                 });
 
             });

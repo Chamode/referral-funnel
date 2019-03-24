@@ -57,14 +57,17 @@ window.onload = function () {
 					this.isMobile = false;
 			},
 			deleteItem(item) {
-
-				var prompt = confirm('Are you sure you want to block or unblock this user?')
+				console.log(item)
+				if (item.user_disabled == 'green' ){
+					var prompt = confirm('Are you sure you want to block this user?')
+				}
+				else var prompt = confirm('Are you sure you want to unblock this user?')
 
 				if (prompt) {
 					return new Promise((resolve, reject) => {
 						jQuery.ajax({
 							type: 'POST',
-							url: '/wp-json/referral-funnel/v1/disable-user',
+							url: '/innerawe2/wp-json/referral-funnel/v1/disable-user',
 							data: {
 								email: item.user_email,
 								user_disabled: item.user_disabled,
@@ -91,7 +94,7 @@ window.onload = function () {
 			fetchData() {
 				return new Promise((resolve, reject) => {
 					jQuery.ajax({
-						url: '/wp-json/referral-funnel/v1/list'
+						url: '/innerawe2/wp-json/referral-funnel/v1/list'
 					}).done(data => {
 						
 						data.forEach(data => {
