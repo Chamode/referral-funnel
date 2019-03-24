@@ -110,6 +110,7 @@ console.log(data)
 									tempObject.reflink.lastIndexOf("p") + 4,
 									tempObject.reflink.lastIndexOf("&")
 								);
+								
 								var refcounter = data.meta[pid][0];
 								var requiredref = data.meta['rf_current_required'][i];
 								

@@ -22,8 +22,11 @@
     var pid = getUrlParameter('pid');
     var uid = getUrlParameter('uid');
 
+    console.log({pid})
+
     let initReferredUser = () => {
         body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
+            console.log('initReferredUser')
             node.addEventListener('submit', e => {
                 let dataArary = $(e.target).serializeArray();
                 $.post("/innerawe2/wp-json/referral-funnel/v1/check-user", {
@@ -37,11 +40,14 @@
                         window.location.reload(true)
                     }
                     else {
+
                         $.post("/innerawe2/wp-json/referral-funnel/v1/addlist", {
                             data: JSON.stringify(dataArary),
+                            pageURL: pageURL,
                             pid: pid,
                             uid: uid
                         }).done(data => {
+                            console.log({addUser: data});
                         }).fail(error => {
                             console.error(error.responseText)
                             alert('Something has went wrong, please refresh the page.');
@@ -58,7 +64,14 @@
     }
 
     let initExistingUser = () => {
-        $.post('/innerawe2/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL }).done(data => {
+        if(!pid) {
+            pid = 0;
+        }
+
+        if (!uid) {
+            uid = 0;
+        }
+        $.post('/innerawe2/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL, pid: pid, uid:uid }).done(data => {
             console.log(data);
             if (data.init) {
                 //Referred user

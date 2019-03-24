@@ -226,7 +226,7 @@ class Referral_Funnel_Admin
         $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
         $user_email = $data[1]->value;
 
-        $userReferrer = get_user_by('id', $uid);
+        // $userReferrer = get_user_by('id', $uid);
         $userRefd = get_user_by('email', $user_email);
 
         if ($userRefd->ID == $uid) {
@@ -279,59 +279,43 @@ class Referral_Funnel_Admin
         $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
         $user_email = $data[1]->value;
         $user_name = $data[0]->value;
-
+        $postMeta = $this->getPostMeta($_POST['pageURL']);
+        $meta_baselink = $postMeta['referral_funnel_meta_baselink'];
+        $response['pageUrl'] = $_POST['pageURL'];
+        $response['postMeta'] = $postMeta;
         //get current user referral count
         $current_ref_count = get_user_meta($uid, $pid)[0];
         $new_ref_count = $current_ref_count + 1;
-        try {
-            // $mailchimp = new MailChimp(get_option('referral_funnel_mc_apikey'));
-            // $post_params = [
-            //     'email_address' => $_POST['email'],
-            //     'status' => 'subscribed',
-            // ];
 
-            // $addtoList = $mailchimp
-            //     ->lists('08bda300fd')
-            //     ->members()
-            //     ->post($post_params);
-
-            // User creation and login is handled here. If the user has previously signed up, they will be auto logged in
+        //Check if user exists
+        $user = get_user_by('email', $user_email); //THIS IS USER ID
+        
+        //If user account does not exist
+        if (!is_wp_error($user)) {
+            $response['create_user'] = 'creating';
+            //Create User
             $user = wp_create_user($user_name, '', $user_email);
-            if (!is_wp_error($user)) {
-                if ($uid != $user->ID) {
-                    update_user_meta($uid, $pid, $new_ref_count);
-                }
-                if (get_user_meta($user, 'user_disabled') == []) {
-                    add_user_meta($user, 'user_disabled', "green");
-                }
-                wp_set_current_user($user);
-                wp_set_auth_cookie($user, true);
-                return get_user_meta($uid, $pid);
 
-            } else {
-                $user = get_user_by('email', $user_email);
-                if (!is_wp_error($user)) {
-                    if ($uid != $user->ID) {
-                        update_user_meta($uid, $pid, $new_ref_count);
-                    }
-                    if (get_user_meta($user, 'user_disabled') == []) {
-                        add_user_meta($user, 'user_disabled', "green");
-                    }
-
-                    wp_set_current_user($user);
-                    wp_set_auth_cookie($user, true);
-                    return get_user_meta($uid, $pid);
-                } else {
-                    return $user->get_error_message();
-                }
-
-            }
-            return "Code should not reach here";
-
-        } catch (Exception $e) {
-            echo '<div class="alert alert-danger" role="alert">' . $e->getMessage() . '</div>';
-            return "Error";
+            add_user_meta($user, $postMeta['pid'], 0);
+            add_user_meta($user, 'rf_current_email_id', 'Free Subscriber.');
+            add_user_meta($user, 'rf_current_required', '0');
+            add_user_meta($user, 'reflink', $_POST['pageURL']);
+            add_user_meta($user, 'rf_postTitle', $postTitle = get_the_title($postMeta['pid']));
+            $response['pose_title'] = get_the_title($postMeta['pid']);
         }
+
+        update_user_meta($uid, $pid, $new_ref_count);
+
+        if (get_user_meta($user, 'user_disabled') == []) {
+            add_user_meta($user, 'user_disabled', "green");
+        }
+
+        wp_set_current_user($user);
+        wp_set_auth_cookie($user, true);
+        $response['user'] = $user;
+            
+        return $response;
+        // return get_user_meta($uid, $pid);
 
     }
 
@@ -409,7 +393,7 @@ class Referral_Funnel_Admin
 
         //Check if user exists
         $user = get_user_by('email', $user_email); //THIS IS USER ID
-        
+
         //If user account does not exist
         if (!is_wp_error($user)) {
             //Create User
@@ -420,7 +404,7 @@ class Referral_Funnel_Admin
             add_user_meta($user, 'rf_current_required', $postMeta['referral_funnel_meta_refNo'][0]);
             $this->referral_generate_link($meta_baselink[0], $postMeta['pid'], $user_email);
 
-        } 
+        }
 
         if (get_user_meta($user, 'user_disabled') == []) {
             add_user_meta($user, 'user_disabled', "green");
@@ -434,7 +418,7 @@ class Referral_Funnel_Admin
         $response['referrals']['goal'] = $postMeta['referral_funnel_meta_refNo'][0];
         $response['referrals']['currentProgress'] = 0;
 
-        $response['link'] = $this->getRefLink($user, $meta_baselink[0]);       
+        $response['link'] = $this->getRefLink($user, $meta_baselink[0]);
 
         return $response;
 
@@ -447,6 +431,9 @@ class Referral_Funnel_Admin
 
     public function ajax_endpoint_init_page()
     {
+        $urlpid = $_POST['pid'];
+        $urluid = $_POST['uid'];
+
         $response = array('success' => false);
 
         if (!wp_verify_nonce($_POST['_wpnonce'], 'wp_rest')) {
@@ -463,8 +450,9 @@ class Referral_Funnel_Admin
         $meta_baselink = $postMeta['referral_funnel_meta_baselink'][0];
 
         //If Number of Referrals not set from Page creation Do not initialised
-        if ($meta_refNo == '' || $meta_refNo == 0 || $meta_refNo == null) {
+        if (($meta_refNo == '' || $meta_refNo == 0 || $meta_refNo == null) && $urlpid == '0' && $urluid == '0') {
             $response['init'] = false;
+            $response['test'] = 'test';
             return $response;
         }
 
@@ -478,7 +466,7 @@ class Referral_Funnel_Admin
             //If user not logged in do nothing
             return $response;
         }
-  
+
         //If user is logged in, get all required data
         $uid = $user->ID;
 
@@ -493,38 +481,20 @@ class Referral_Funnel_Admin
 
         $response['shareLink'] = $refLink;
 
-        // if (get_user_meta($userID, $pid) == []) {
-        //     add_user_meta($userID, $pid, 0);
-        //     add_user_meta($userID, 'rf_current_email_id', $meta_email_id[0]);
-        //     add_user_meta($userID, 'rf_current_required', $meta_refNo[0]);
-
-        // }
-
-        // $userMeta = get_user_meta($userID, $pid);
-
-        // if ($userMeta[0] >= $meta_refNo[0]) {
-        //     $sendemail = $this->send_email($meta_workflowid[0], $meta_email_id[0], $user_email, $userID);
-        //     return $sendemail;
-        // }
-
-        // $response['referrals']['currentProgress'] = $userMeta[0];
-        // $response['referrals']['goal'] = $meta_refNo[0];
-
-        // $response['shareLink'] = $uniquePath;
-
         return $response;
 
     }
 
-    public function getRefLink($userID, $baselink) {
+    public function getRefLink($userID, $baselink)
+    {
         $linkArray = get_user_meta($userID, 'reflink');
         $currentLink = '';
-        
+
         //Finding the current ref link for the current page user is on
-        foreach($linkArray as $link) {
+        foreach ($linkArray as $link) {
             if (strpos($link, $baselink) !== false) {
-               $currentLink = $link;
-               break;
+                $currentLink = $link;
+                break;
             }
         }
 

@@ -57,7 +57,6 @@ class Referral_Funnel extends Component {
                 >
                     <PanelBody>
 
-                    
                         <TextControl
                             label={__('Number of Referrals')}
                             value={this.state.refNo}
