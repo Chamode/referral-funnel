@@ -49,7 +49,6 @@ function referral_funnel_admin_display()
                   <td class="text-xs-center">{{ props.item.reflink }}</td>
                   <td class="text-xs-center">{{ props.item.rf_postTitle }}</td>
                   <td class="text-xs-center">{{ props.item.rf_current_email_id }}</td>
-                  <td class="text-xs-center">{{ props.item.refcount }}</td>
                   <td class="text-xs-center">{{ props.item.currprogress }}</td>
                   <td class="text-xs-center">
                         <v-icon
@@ -71,7 +70,6 @@ function referral_funnel_admin_display()
                       <li class="flex-item" data-label="Referral Link">{{ props.item.meta.refllink[0] }}</li>
                       <li class="flex-item" data-label="Current Post">{{ props.item.meta.rf_postTitle[0] }}</li>
                       <li class="flex-item" data-label="Email ID">{{ props.item.meta.rf_current_email_id[0] }}</li>
-                      <li class="flex-item" data-label="Total Invites">{{ props.item.totalinvited }}</li>
                       <li class="flex-item" data-label="Current Progress">{{ props.item.currprogress }}</li>
                       <td class="justify-center layout px-30">
                           <v-icon

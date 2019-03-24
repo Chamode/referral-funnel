@@ -19,10 +19,9 @@
 
     var pageURL = $(location).attr("href");
 
-    var pid = getUrlParameter('pid');
     var uid = getUrlParameter('uid');
 
-    console.log({pid})
+    console.log({uid})
 
     let initReferredUser = () => {
         body.querySelectorAll('.tve-leads-conversion-object form').forEach(node => {
@@ -31,7 +30,6 @@
                 let dataArary = $(e.target).serializeArray();
                 $.post("/innerawe2/wp-json/referral-funnel/v1/check-user", {
                     data: JSON.stringify(dataArary),
-                    pid: pid,
                     uid: uid
                 }).done(data => {
                     if (data === true) {
@@ -44,7 +42,6 @@
                         $.post("/innerawe2/wp-json/referral-funnel/v1/addlist", {
                             data: JSON.stringify(dataArary),
                             pageURL: pageURL,
-                            pid: pid,
                             uid: uid
                         }).done(data => {
                             console.log({addUser: data});
@@ -64,21 +61,18 @@
     }
 
     let initExistingUser = () => {
-        if(!pid) {
-            pid = 0;
-        }
 
         if (!uid) {
             uid = 0;
         }
-        $.post('/innerawe2/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL, pid: pid, uid:uid }).done(data => {
+        $.post('/innerawe2/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL, uid:uid }).done(data => {
             console.log(data);
             if (data.init) {
                 //Referred user
-                if (pid && uid && data.user.ID === 0)
+                if (uid && data.user.ID === 0)
                     initReferredUser();
                 //Unreffered User
-                else if (!pid && !uid && data.user.ID === 0)
+                else if (!uid && data.user.ID === 0)
                     initUnreferredUser();
                 //User already signed up
                 else

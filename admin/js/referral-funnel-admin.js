@@ -36,10 +36,6 @@ window.onload = function () {
 				value: 'rf_current_email_id'
 			},
 			{
-				text: 'Total Invites',
-				value: 'refcount'
-			},
-			{
 				text: 'Current Progress',
 				value: 'currprogress'
 			},
@@ -96,7 +92,7 @@ window.onload = function () {
 					jQuery.ajax({
 						url: '/innerawe2/wp-json/referral-funnel/v1/list'
 					}).done(data => {
-						
+						// console.log(data)
 						data.forEach(data => {
 console.log(data)
 							for (var i = 0; i < data.meta.reflink.length; i++) {
@@ -111,12 +107,10 @@ console.log(data)
 									tempObject.reflink.lastIndexOf("&")
 								);
 								
-								var refcounter = data.meta[pid][0];
 								var requiredref = data.meta['rf_current_required'][i];
 								
 								data.meta.user_disabled[0] == [] ? data.meta.user_disabled[0] == ["green"] : null
-								tempObject.refcount = refcounter
-								tempObject.currprogress = refcounter + '/' + requiredref
+								tempObject.currprogress = data.currprogress;
 								tempObject.rf_postTitle = data.meta.rf_postTitle[i]
 								tempObject.rf_current_email_id = data.meta.rf_current_email_id[i]
 								tempObject.user_disabled = data.meta.user_disabled[0]

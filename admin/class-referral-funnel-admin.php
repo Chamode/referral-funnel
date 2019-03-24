@@ -221,7 +221,7 @@ class Referral_Funnel_Admin
     }
     public function ajax_endpoint_check_user()
     {
-        $pid = $_POST['pid'];
+        $pid = url_to_postid( $_POST['pageURL'] );
         $uid = $_POST['uid'];
         $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
         $user_email = $data[1]->value;
@@ -247,14 +247,16 @@ class Referral_Funnel_Admin
             $subsWithMeta = array();
 
             $count = 0;
+            
             foreach ($subscribers as $user_id) {
                 $specificMeta = get_user_meta($user_id->ID);
                 $link = $specificMeta['reflink'][0];
-                $pid = strstr($link, '&uid', true);
-                $pid = trim(substr($pid, strpos($pid, '=') + 1));
+                $pid = url_to_postid( $link );
 
                 $refcounter = $specificMeta[$pid][0];
                 $requiredref = $specificMeta['rf_current_required'][0];
+                $response[$count]['specificMeta'] = $specificMeta;
+                $response[$count]['pid'] = $pid;
 
                 $subsWithMeta[$count]['data'] = $user_id->data;
                 $subsWithMeta[$count]['meta'] = $specificMeta;
@@ -274,7 +276,8 @@ class Referral_Funnel_Admin
     }
     public function ajax_endpoint_addlist_referred()
     {
-        $pid = $_POST['pid'];
+        $pid = url_to_postid($_POST['pageURL']);
+
         $uid = $_POST['uid'];
         $data = json_decode(html_entity_decode(stripslashes($_POST['data'])));
         $user_email = $data[1]->value;
@@ -299,7 +302,7 @@ class Referral_Funnel_Admin
             add_user_meta($user, $postMeta['pid'], 0);
             add_user_meta($user, 'rf_current_email_id', 'Free Subscriber.');
             add_user_meta($user, 'rf_current_required', '0');
-            add_user_meta($user, 'reflink', $_POST['pageURL']);
+            add_user_meta($user, 'reflink', '-');
             add_user_meta($user, 'rf_postTitle', $postTitle = get_the_title($postMeta['pid']));
             $response['pose_title'] = get_the_title($postMeta['pid']);
         }
@@ -399,7 +402,7 @@ class Referral_Funnel_Admin
             //Create User
             $user = wp_create_user($user_name, '', $user_email);
 
-            add_user_meta($user, $postMeta['pid'], 0);
+            add_user_meta($user, url_to_postid( $meta_baselink[0] ), 0);
             add_user_meta($user, 'rf_current_email_id', $postMeta['referral_funnel_meta_workflow_emailid'][0]);
             add_user_meta($user, 'rf_current_required', $postMeta['referral_funnel_meta_refNo'][0]);
             $this->referral_generate_link($meta_baselink[0], $postMeta['pid'], $user_email);
@@ -426,12 +429,12 @@ class Referral_Funnel_Admin
 
     public function generate_unique_path($cleanPath, $postID, $userID)
     {
-        return $cleanPath . '?pid=' . $postID . '&uid=' . $userID;
+        return $cleanPath . '?uid=' . $userID;
     }
 
     public function ajax_endpoint_init_page()
     {
-        $urlpid = $_POST['pid'];
+        $urlpid = url_to_postid( $_POST['pageURL'] );
         $urluid = $_POST['uid'];
 
         $response = array('success' => false);
