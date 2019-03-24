@@ -20,6 +20,7 @@
     var pageURL = $(location).attr("href");
 
     var uid = getUrlParameter('uid');
+    var pid = getUrlParameter('pid');
 
     console.log({uid})
 
@@ -42,6 +43,7 @@
                         $.post("/innerawe2/wp-json/referral-funnel/v1/addlist", {
                             data: JSON.stringify(dataArary),
                             pageURL: pageURL,
+                            pid: pid,
                             uid: uid
                         }).done(data => {
                             console.log({addUser: data});
@@ -72,7 +74,7 @@
                 if (uid && data.user.ID === 0)
                     initReferredUser();
                 //Unreffered User
-                else if (!uid && data.user.ID === 0)
+                else if (!data.hasUserSignedUp || !uid && data.user.ID === 0)
                     initUnreferredUser();
                 //User already signed up
                 else
@@ -96,6 +98,8 @@
                 $.post('/innerawe2/wp-json/referral-funnel/v1/user-register', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
                     console.log(data)
                     createShareBoxHtml(data.link, data.referrals);
+                }).fail(error => {
+                    console.log(error);
                 });
 
             });

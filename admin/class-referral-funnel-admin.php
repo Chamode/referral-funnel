@@ -316,6 +316,20 @@ class Referral_Funnel_Admin
         wp_set_current_user($user);
         wp_set_auth_cookie($user, true);
         $response['user'] = $user;
+
+        //Checks if the original user should get the email
+        $userMeta = get_user_meta($uid, $_POST['pid']);
+        $oriPost = get_post_meta($_POST['pid']);
+        if ($userMeta[0] >= $oriPost['referral_funnel_meta_refNo'][0]) {
+            $meta_workflowid = $oriPost['referral_funnel_meta_workflowid'];
+            $meta_email_id = $oriPost['referral_funnel_meta_workflow_emailid'];
+            $oriUser = get_user_by('id', $uid);
+            $userID = $oriUser->ID;
+            $user_email = $oriUser->data->user_email;
+
+            $sendemail = $this->send_email($meta_workflowid[0], $meta_email_id[0], $user_email, $userID);
+            return $sendemail;
+        }
             
         return $response;
         // return get_user_meta($uid, $pid);
@@ -398,16 +412,16 @@ class Referral_Funnel_Admin
         $user = get_user_by('email', $user_email); //THIS IS USER ID
 
         //If user account does not exist
-        if (!is_wp_error($user)) {
+        if (!$user) {
             //Create User
-            $user = wp_create_user($user_name, '', $user_email);
-
-            add_user_meta($user, url_to_postid( $meta_baselink[0] ), 0);
-            add_user_meta($user, 'rf_current_email_id', $postMeta['referral_funnel_meta_workflow_emailid'][0]);
-            add_user_meta($user, 'rf_current_required', $postMeta['referral_funnel_meta_refNo'][0]);
-            $this->referral_generate_link($meta_baselink[0], $postMeta['pid'], $user_email);
-
+            $user = wp_create_user($user_email, '', $user_email);
         }
+        $response['postMeta'] = $this->getPostMeta($_POST['pageURL']);
+        add_user_meta($user, url_to_postid( $meta_baselink[0] ), 0);
+        add_user_meta($user, 'rf_current_email_id', $postMeta['referral_funnel_meta_workflow_emailid'][0]);
+        add_user_meta($user, 'rf_current_required', $postMeta['referral_funnel_meta_refNo'][0]);
+
+        $this->referral_generate_link($meta_baselink[0], $postMeta['pid'], $user_email);
 
         if (get_user_meta($user, 'user_disabled') == []) {
             add_user_meta($user, 'user_disabled', "green");
@@ -421,7 +435,7 @@ class Referral_Funnel_Admin
         $response['referrals']['goal'] = $postMeta['referral_funnel_meta_refNo'][0];
         $response['referrals']['currentProgress'] = 0;
 
-        $response['link'] = $this->getRefLink($user, $meta_baselink[0]);
+        $response['link'] = $this->getRefLink($user->ID, $meta_baselink[0]);
 
         return $response;
 
@@ -429,7 +443,7 @@ class Referral_Funnel_Admin
 
     public function generate_unique_path($cleanPath, $postID, $userID)
     {
-        return $cleanPath . '?uid=' . $userID;
+        return $cleanPath . '?pid=' . $postID . '&uid=' . $userID;
     }
 
     public function ajax_endpoint_init_page()
@@ -464,6 +478,13 @@ class Referral_Funnel_Admin
         $user = wp_get_current_user();
         $response['user'] = $user;
 
+        //Checks if user has signed up for this post
+        if ( $user->ID != 0) {
+            $meta = get_user_meta($user->ID);
+            $response['hasUserSignedUp'] = array_key_exists($urlpid, $meta);
+            return $response;
+        }
+
         //Checks if user is logged in
         if ($user->ID === 0) {
             //If user not logged in do nothing
@@ -483,6 +504,7 @@ class Referral_Funnel_Admin
         $response['referrals']['goal'] = $meta_refNo;
 
         $response['shareLink'] = $refLink;
+
 
         return $response;
 
