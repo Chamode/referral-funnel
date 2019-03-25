@@ -19,7 +19,7 @@
                 getUserJoinedDate() {
                     //MAKE SURE TO DELETE 'joinedDate and maxHours' below, AND CHANGE CODE BELOW TO USE FROM DATA OBJECT
 
-                    $.get('/innerawe2/wp-json/referral-funnel/v1/countdown').done((response) => {
+                    $.get('/innerawesome/wp-json/referral-funnel/v1/countdown').done((response) => {
                         this.joinedDate = response[0][0]
                         this.maxHours = response[1]
 

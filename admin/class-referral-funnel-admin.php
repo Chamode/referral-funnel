@@ -287,7 +287,7 @@ class Referral_Funnel_Admin
         $response['pageUrl'] = $_POST['pageURL'];
         $response['postMeta'] = $postMeta;
         //get current user referral count
-        $current_ref_count = get_user_meta($uid, $pid)[0];
+        $current_ref_count = get_user_meta($uid, $_POST['pid'])[0];
         $new_ref_count = $current_ref_count + 1;
 
         //Check if user exists
@@ -297,17 +297,17 @@ class Referral_Funnel_Admin
         if (!is_wp_error($user)) {
             $response['create_user'] = 'creating';
             //Create User
-            $user = wp_create_user($user_name, '', $user_email);
+            $user = wp_create_user($user_email, '', $user_email);
 
-            add_user_meta($user, $postMeta['pid'], 0);
-            add_user_meta($user, 'rf_current_email_id', 'Free Subscriber.');
-            add_user_meta($user, 'rf_current_required', '0');
-            add_user_meta($user, 'reflink', '-');
-            add_user_meta($user, 'rf_postTitle', $postTitle = get_the_title($postMeta['pid']));
+            $response['addUserMeta']= $this->addUserMeta($user,$postMeta['pid'], 'Not Subscribed.', 'Free');
+            $this->referral_generate_fake_link($user,get_the_title($postMeta['pid'])); 
             $response['pose_title'] = get_the_title($postMeta['pid']);
         }
 
-        update_user_meta($uid, $pid, $new_ref_count);
+        $response['uid'] = $uid;
+        $response['pid'] = $_POST['pid'];
+        $response['new_ref_count'] = $new_ref_count;
+        $response['updateUserMeta'] = update_user_meta($uid, $_POST['pid'], $new_ref_count);
 
         if (get_user_meta($user, 'user_disabled') == []) {
             add_user_meta($user, 'user_disabled', "green");
@@ -386,6 +386,11 @@ class Referral_Funnel_Admin
         return get_user_meta($user_id, 'user_disabled')[0];
 
     }
+
+    public function referral_generate_fake_link($user, $postTitle) {
+        add_user_meta($user, 'reflink', '-');
+        add_user_meta($user, 'rf_postTitle', $postTitle);
+    }
     public function referral_generate_link($baselink, $postID, $user_email)
     {
         $user = get_user_by('email', $user_email);
@@ -416,13 +421,25 @@ class Referral_Funnel_Admin
             //Create User
             $user = wp_create_user($user_email, '', $user_email);
         }
-        $response['postMeta'] = $this->getPostMeta($_POST['pageURL']);
-        add_user_meta($user, url_to_postid( $meta_baselink[0] ), 0);
-        add_user_meta($user, 'rf_current_email_id', $postMeta['referral_funnel_meta_workflow_emailid'][0]);
-        add_user_meta($user, 'rf_current_required', $postMeta['referral_funnel_meta_refNo'][0]);
+        $userID = is_int($user)? $user : $user->ID;
+        $response['postMeta'] = $postMeta;
+        $response['user'] = $user;
 
-        $this->referral_generate_link($meta_baselink[0], $postMeta['pid'], $user_email);
-
+        $meta_refNo = $postMeta['referral_funnel_meta_refNo'][0];
+        //If Number of Referrals not set from Page creation Do not initialised
+        if ($meta_refNo == '' || $meta_refNo == 0 || $meta_refNo == null) {
+            
+            $response['addUserMeta']= $this->addUserMeta($userID,url_to_postid( $meta_baselink[0]), 'Not Subscribed.', 'Free');
+            $this->referral_generate_fake_link($user,get_the_title($postMeta['pid'])); 
+            $response['init'] = false;
+        } else {
+            //Properly initialised user if ref number is initialised
+            $response['addUserMeta']= $this->addUserMeta($userID,$postMeta['pid'], $postMeta['referral_funnel_meta_workflow_emailid'][0], $meta_refNo);
+            $this->referral_generate_link($meta_baselink[0], $postMeta['pid'], $user_email);
+            $response['init'] = true;
+            $response['link'] = $this->getRefLink($userID, $meta_baselink[0]);
+        }
+        
         if (get_user_meta($user, 'user_disabled') == []) {
             add_user_meta($user, 'user_disabled', "green");
         }
@@ -434,8 +451,6 @@ class Referral_Funnel_Admin
         $response['user'] = $user;
         $response['referrals']['goal'] = $postMeta['referral_funnel_meta_refNo'][0];
         $response['referrals']['currentProgress'] = 0;
-
-        $response['link'] = $this->getRefLink($user->ID, $meta_baselink[0]);
 
         return $response;
 
@@ -508,6 +523,14 @@ class Referral_Funnel_Admin
 
         return $response;
 
+    }
+
+    public function addUserMeta($userID, $postID,$emailID, $refNum) {
+        add_user_meta($userID, $postID , 0);
+        add_user_meta($userID, 'rf_current_email_id', $emailID);
+        add_user_meta($userID, 'rf_current_required', $refNum);
+
+        return array($userID, $postID,$emailID, $refNum);
     }
 
     public function getRefLink($userID, $baselink)

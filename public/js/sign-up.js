@@ -29,7 +29,7 @@
             console.log('initReferredUser')
             node.addEventListener('submit', e => {
                 let dataArary = $(e.target).serializeArray();
-                $.post("/innerawe2/wp-json/referral-funnel/v1/check-user", {
+                $.post("/innerawesome/wp-json/referral-funnel/v1/check-user", {
                     data: JSON.stringify(dataArary),
                     uid: uid
                 }).done(data => {
@@ -40,7 +40,7 @@
                     }
                     else {
 
-                        $.post("/innerawe2/wp-json/referral-funnel/v1/addlist", {
+                        $.post("/innerawesome/wp-json/referral-funnel/v1/addlist", {
                             data: JSON.stringify(dataArary),
                             pageURL: pageURL,
                             pid: pid,
@@ -67,7 +67,7 @@
         if (!uid) {
             uid = 0;
         }
-        $.post('/innerawe2/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL, uid:uid }).done(data => {
+        $.post('/innerawesome/wp-json/referral-funnel/v1/init-page', { _wpnonce: ref_funnel.nonce, pageURL: pageURL, uid:uid }).done(data => {
             console.log(data);
             if (data.init) {
                 //Referred user
@@ -95,9 +95,10 @@
             node.addEventListener('submit', e => {
                 e.preventDefault();
                 let dataArary = $(e.target).serializeArray();
-                $.post('/innerawe2/wp-json/referral-funnel/v1/user-register', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
+                $.post('/innerawesome/wp-json/referral-funnel/v1/user-register', { data: JSON.stringify(dataArary), pageURL: pageURL }).done(data => {
                     console.log(data)
-                    createShareBoxHtml(data.link, data.referrals);
+                    if(data.init)
+                        createShareBoxHtml(data.link, data.referrals);
                 }).fail(error => {
                     console.log(error);
                 });

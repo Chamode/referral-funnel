@@ -63,7 +63,7 @@ window.onload = function () {
 					return new Promise((resolve, reject) => {
 						jQuery.ajax({
 							type: 'POST',
-							url: '/innerawe2/wp-json/referral-funnel/v1/disable-user',
+							url: '/innerawesome/wp-json/referral-funnel/v1/disable-user',
 							data: {
 								email: item.user_email,
 								user_disabled: item.user_disabled,
@@ -90,7 +90,7 @@ window.onload = function () {
 			fetchData() {
 				return new Promise((resolve, reject) => {
 					jQuery.ajax({
-						url: '/innerawe2/wp-json/referral-funnel/v1/list'
+						url: '/innerawesome/wp-json/referral-funnel/v1/list'
 					}).done(data => {
 						// console.log(data)
 						data.forEach(data => {
@@ -107,10 +107,16 @@ console.log(data)
 									tempObject.reflink.lastIndexOf("&")
 								);
 								
+								let currentProgress ='';
 								var requiredref = data.meta['rf_current_required'][i];
+
+								if(data.meta[pid])
+									currentProgress = `${data.meta[pid]}/${requiredref}`;
+								else
+									currentProgress = `${requiredref}`;
 								
 								data.meta.user_disabled[0] == [] ? data.meta.user_disabled[0] == ["green"] : null
-								tempObject.currprogress = data.currprogress;
+								tempObject.currprogress = currentProgress;
 								tempObject.rf_postTitle = data.meta.rf_postTitle[i]
 								tempObject.rf_current_email_id = data.meta.rf_current_email_id[i]
 								tempObject.user_disabled = data.meta.user_disabled[0]

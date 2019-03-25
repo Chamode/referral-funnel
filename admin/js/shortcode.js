@@ -25,7 +25,7 @@
 //         jQuery.ajax({
 //     type: 'POST',
 //   dataType: 'json',
-// url: 'http://localhost/wp-plugin/innerawe2/wp-json/referral-funnel/v1/init-referral-counter',
+// url: 'http://localhost/wp-plugin/innerawesome/wp-json/referral-funnel/v1/init-referral-counter',
 // 		data: {pid: pid,
 //                uid:uid},
 // 		success: function(data){
@@ -85,7 +85,7 @@
 //           console.log(email)
 //           $.ajax({
 //              type: "POST",
-//              url: "http://localhost/wp-plugin/innerawe2/wp-json/referral-funnel/v1/addlist",
+//              url: "http://localhost/wp-plugin/innerawesome/wp-json/referral-funnel/v1/addlist",
 //              data: {pageURL: pageURL,
 //                  email:email,
 //                  pid: pid,
@@ -97,7 +97,7 @@
 //                           $.ajax({
 //                            type: 'POST',
 //         dataType: 'json',
-// 		url: 'http://localhost/wp-plugin/innerawe2/wp-json/referral-funnel/v1/getmeta',
+// 		url: 'http://localhost/wp-plugin/innerawesome/wp-json/referral-funnel/v1/getmeta',
 // 		data: {pageURL: pageURL,
 // 		    email:email
 // 		},
@@ -128,7 +128,7 @@
 //           console.log(email)
 //           $.ajax({
 //              type: "POST",
-//              url: "http://localhost/wp-plugin/innerawe2/wp-json/referral-funnel/v1/addlist",
+//              url: "http://localhost/wp-plugin/innerawesome/wp-json/referral-funnel/v1/addlist",
 //              data: {pageURL: pageURL,
 //                  email:email
 //              },
@@ -138,7 +138,7 @@
 //                           $.ajax({
 //                            type: 'POST',
 //         dataType: 'json',
-// 		url: 'http://localhost/wp-plugin/innerawe2/wp-json/referral-funnel/v1/getmeta',
+// 		url: 'http://localhost/wp-plugin/innerawesome/wp-json/referral-funnel/v1/getmeta',
 // 		data: {pageURL: pageURL,
 // 		    email:email
 // 		},
